@@ -1,0 +1,26 @@
+{
+  "go": "go version go1.27.3 darwin/arm64",
+  "libxray_commit": "7fe8528063e54343af8ba9a37431afc56000de21",
+  "xcode": "Xcode 27.2\nBuild version 27B52",
+  "modules_sha256": "0756e02ff5e4371737a69cb3c4b571d2087d117c09d448849be6818e1ffe9dbc",
+  "local_core_patches": [],
+  "geo_assets": [],
+  "files": {
+    "Info.plist": "64385aee882daddb3854a7a8c8b01ca58151cf865181ada3f2a41b86572ff527",
+    "ios-arm64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
+    "ios-arm64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
+    "ios-arm64/libXray.a": "a201018c0f20fbb462099f9d7398e35832e90e8670ca90648de939909462c424",
+    "ios-arm64_x86_64-simulator/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
+    "ios-arm64_x86_64-simulator/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
+    "ios-arm64_x86_64-simulator/libXray.a": "aa60e70deef13b7c03dbdb2b88b69f41a222f4a9b1ac504f162554c673c309ba",
+    "macos-arm64_x86_64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
+    "macos-arm64_x86_64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
+    "macos-arm64_x86_64/libXray.a": "bba4ece7cbf9774ae4357d45425b319afed04d2e2b460fe0e88901d4d662d3d7",
+    "tvos-arm64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
+    "tvos-arm64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
+    "tvos-arm64/libXray.a": "d206b991893538c83f59c0e1cc07216006c5fafa149d28f78b3a91c8cfa0b6ac",
+    "tvos-arm64_x86_64-simulator/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
+    "tvos-arm64_x86_64-simulator/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
+    "tvos-arm64_x86_64-simulator/libXray.a": "e395fa08a516eb0bab26f980c95731d5e6db7a40f0af6d8a3ac0c44403ad936e"
+  }
+}

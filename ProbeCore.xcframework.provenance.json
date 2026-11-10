@@ -1,0 +1,48 @@
+{
+  "go": "go version go1.27.3 darwin/arm64",
+  "libxrayCommit": "7fe8528063e54343af8ba9a37431afc56000de21",
+  "xrayModule": "v1.260327.1-0.20261031132019-a4a3dff5b20c",
+  "isolationPatchSHA256": "faf3bb75e84e9599650f47ce78e867e84a2d4fd05c8593782f2854eb53a5ea64",
+  "upstreamFiles": {
+    "transport/internet/dialer.go": "ed2825ff30a2bfdfacf8681cd1af81d96179103ccff0a0b0b42f4ea64db451d4",
+    "core/xray.go": "66edf1a9ed6b9683b4f668612e6c6e876830cffb07521517f03a21e630f7ef15",
+    "core/context.go": "00bb4bec6236e621f2c1557b6b0b12d75be75b22eae93677a514091bde49627a",
+    "app/proxyman/outbound/handler.go": "77d3085a461b30a6a4d25273ba1487c9715655e1a6cfeafe17d6df0605f2c453",
+    "proxy/freedom/freedom.go": "9bc955f366bedfceee7d5030d285c417768453b18f54f8286c68fea19a2b7857",
+    "transport/internet/grpc/dial.go": "f429ec9bb1fa143bc9c42cbcd976a20ef17774e37403444d0232d621d5de439d",
+    "transport/internet/splithttp/dialer.go": "ed4ec0d02b7f4bed517f1326c534186e7648af81fe0c974f601a1e933666d0cd",
+    "app/observatory/observer.go": "13695e0edc373d198afe7b423b83ae7f19b9cad666856be4d3cf647040a2f434"
+  },
+  "adapterSHA256": "94f1ba7ee9702b7ac86daf7a10e0daa53ea2d44fd39af1ce069385d068d66594",
+  "adapterSources": {
+    "main.go": "94f1ba7ee9702b7ac86daf7a10e0daa53ea2d44fd39af1ce069385d068d66594",
+    "readiness.go": "bd8f655ea74ad4a9a51ebc716350ecde2027bb6f5f85b4eb8388e8f1ec281f14"
+  },
+  "moduleFiles": {
+    "go.mod": "82405b5e7932314d00a11210378b0054cddce917b5119da97337de7f92b93a1e",
+    "go.sum": "be2bf91f51bf0c6520511794a768adea74aa55bcd56e44a34d205743a26c7269"
+  },
+  "files": {
+    "Info.plist": "f4ca05a2a877ffd929bace6a090379ef95e6fdc9ed0895dc4b7cde86f14dbffa",
+    "ios-arm64/ProbeCore.framework/ProbeCore": "e532e7d100fc6fbc6d4605528784d48a940d30a151f60534e0a417ee30504352",
+    "ios-arm64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
+    "ios-arm64/ProbeCore.framework/Headers/ProbeCore.h": "41a29b9aacfbf858abd26f642a37297f88d320f93b453d2ee02b06f6d7316d03",
+    "ios-arm64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
+    "ios-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "c7dfd359644fb9b94448adfea413b2816e4238cb857c9a182124584f5e77dce5",
+    "ios-arm64_x86_64-simulator/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
+    "ios-arm64_x86_64-simulator/ProbeCore.framework/Headers/ProbeCore.h": "41a29b9aacfbf858abd26f642a37297f88d320f93b453d2ee02b06f6d7316d03",
+    "ios-arm64_x86_64-simulator/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
+    "macos-arm64_x86_64/ProbeCore.framework/ProbeCore": "445222b113ce42ef9ad0d5529147fdc1265a0737e7613440ab6adf11fe567917",
+    "macos-arm64_x86_64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
+    "macos-arm64_x86_64/ProbeCore.framework/Headers/ProbeCore.h": "41a29b9aacfbf858abd26f642a37297f88d320f93b453d2ee02b06f6d7316d03",
+    "macos-arm64_x86_64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
+    "tvos-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "34664e1da5d51bb15ad000104967afc2855e6671214efb47e989b65e5e429c55",
+    "tvos-arm64_x86_64-simulator/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
+    "tvos-arm64_x86_64-simulator/ProbeCore.framework/Headers/ProbeCore.h": "41a29b9aacfbf858abd26f642a37297f88d320f93b453d2ee02b06f6d7316d03",
+    "tvos-arm64_x86_64-simulator/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
+    "tvos-arm64/ProbeCore.framework/ProbeCore": "718060a58eb3241cd123bfc1395304d25d515b930c0a4f1865101c02242d09a4",
+    "tvos-arm64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
+    "tvos-arm64/ProbeCore.framework/Headers/ProbeCore.h": "41a29b9aacfbf858abd26f642a37297f88d320f93b453d2ee02b06f6d7316d03",
+    "tvos-arm64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721"
+  }
+}

@@ -1,0 +1,306 @@
+--- a/transport/internet/dialer.go
++++ b/transport/internet/dialer.go
+@@ -4,6 +4,7 @@
+ 	"context"
+ 	"fmt"
+ 	"strings"
++	"sync"
+ 
+ 	"github.com/xtls/xray-core/common"
+ 	"github.com/xtls/xray-core/common/dice"
+@@ -85,6 +86,9 @@
+ )
+ 
+ func LookupForIP(domain string, strategy DomainStrategy, localAddr net.Address) ([]net.IP, error) {
++	return lookupForIP(dnsClient, domain, strategy, localAddr)
++}
++func lookupForIP(dnsClient dns.Client, domain string, strategy DomainStrategy, localAddr net.Address) ([]net.IP, error) {
+ 	if dnsClient == nil {
+ 		return nil, errors.New("DNS client not initialized")
+ 	}
+@@ -253,7 +257,7 @@
+ 		if outboundName == "freedom" && dest.Network == net.Network_UDP && origTargetAddr != nil && src == nil {
+ 			finalStrategy = finalStrategy.GetDynamicStrategy(origTargetAddr.Family())
+ 		}
+-		ips, err := LookupForIP(dest.Address.Domain(), finalStrategy, src)
++		ips, err := LookupForIPContext(ctx, dest.Address.Domain(), finalStrategy, src)
+ 		if err != nil {
+ 			errors.LogErrorInner(ctx, err, "failed to resolve ip")
+ 			if sockopt.DomainStrategy.ForceIP() {
+@@ -268,6 +272,7 @@
+ 	}
+ 
+ 	if len(sockopt.DialerProxy) > 0 {
++		_, obm := dialerFeatures(ctx)
+ 		if obm == nil {
+ 			return nil, errors.New("there is no outbound manager for dialerProxy")
+ 		}
+@@ -281,6 +286,50 @@
+ 	return effectiveSystemDialer.Dial(ctx, src, dest, sockopt)
+ }
+ 
++// InstanceDialer keeps a probe's DNS and outbound chains out of process globals.
++// Created before core construction and bound before handlers start.
++type InstanceDialer struct {
++	sync.RWMutex
++	dns       dns.Client
++	outbounds outbound.Manager
++	owner     context.Context
++}
++type instanceDialerKey struct{}
++
++func NewInstanceDialer(ctx context.Context) *InstanceDialer { return &InstanceDialer{owner: ctx} }
++func (s *InstanceDialer) Bind(dc dns.Client, om outbound.Manager) {
++	s.Lock()
++	defer s.Unlock()
++	s.dns = dc
++	s.outbounds = om
++}
++func (s *InstanceDialer) Owner() context.Context { return s.owner }
++func InstanceDialerFromContext(ctx context.Context) *InstanceDialer {
++	state, _ := ctx.Value(instanceDialerKey{}).(*InstanceDialer)
++	return state
++}
++func ContextWithInstanceDialer(ctx context.Context, state *InstanceDialer) context.Context {
++	if state == nil {
++		return ctx
++	}
++	return context.WithValue(ctx, instanceDialerKey{}, state)
++}
++func CopyInstanceDialer(dst, src context.Context) context.Context {
++	return ContextWithInstanceDialer(dst, InstanceDialerFromContext(src))
++}
++func dialerFeatures(ctx context.Context) (dns.Client, outbound.Manager) {
++	if s := InstanceDialerFromContext(ctx); s != nil {
++		s.RLock()
++		defer s.RUnlock()
++		return s.dns, s.outbounds
++	}
++	return dnsClient, obm
++}
++func LookupForIPContext(ctx context.Context, domain string, strategy DomainStrategy, localAddr net.Address) ([]net.IP, error) {
++	dc, _ := dialerFeatures(ctx)
++	return lookupForIP(dc, domain, strategy, localAddr)
++}
++
+ func InitSystemDialer(dc dns.Client, om outbound.Manager) {
+ 	dnsClient = dc
+ 	obm = om
+--- a/core/xray.go
++++ b/core/xray.go
+@@ -182,6 +182,9 @@
+ 
+ 	done, err := initInstanceWithConfig(config, server)
+ 	if done {
++		if internet.InstanceDialerFromContext(ctx) != nil {
++			_ = server.Close()
++		}
+ 		return nil, err
+ 	}
+ 
+@@ -189,8 +192,10 @@
+ }
+ 
+ func initInstanceWithConfig(config *Config, server *Instance) (bool, error) {
+-	if err := platform.ReloadEnvSettings(); err != nil {
+-		return true, errors.New("failed to reload environment settings").Base(err)
++	if internet.InstanceDialerFromContext(server.ctx) == nil {
++		if err := platform.ReloadEnvSettings(); err != nil {
++			return true, errors.New("failed to reload environment settings").Base(err)
++		}
+ 	}
+ 	server.ctx = context.WithValue(server.ctx, "cone",
+ 		platform.NewEnvFlag(platform.UseCone).GetValue(func() string { return "" }) != "true")
+@@ -229,13 +234,13 @@
+ 		}
+ 	}
+ 
+-	internet.InitSystemDialer(
+-		server.GetFeature(dns.ClientType()).(dns.Client),
+-		func() outbound.Manager {
+-			obm, _ := server.GetFeature(outbound.ManagerType()).(outbound.Manager)
+-			return obm
+-		}(),
+-	)
++	dc := server.GetFeature(dns.ClientType()).(dns.Client)
++	om, _ := server.GetFeature(outbound.ManagerType()).(outbound.Manager)
++	if state := internet.InstanceDialerFromContext(server.ctx); state != nil {
++		state.Bind(dc, om)
++	} else {
++		internet.InitSystemDialer(dc, om)
++	}
+ 
+ 	server.resolveLock.Lock()
+ 	if server.pendingResolutions != nil {
+--- a/core/context.go
++++ b/core/context.go
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"context"
++	"github.com/xtls/xray-core/transport/internet"
+ )
+ 
+ // XrayKey is the key type of Instance in Context, exported for test.
+@@ -49,5 +50,5 @@
+ */
+ func ToBackgroundDetachedContext(ctx context.Context) context.Context {
+ 	instance := MustFromContext(ctx)
+-	return toContext(context.Background(), instance)
++	return toContext(internet.CopyInstanceDialer(context.Background(), instance.ctx), instance)
+ }
+--- a/app/proxyman/outbound/handler.go
++++ b/app/proxyman/outbound/handler.go
+@@ -184,7 +184,7 @@
+ 		if ob.Target.Network == net.Network_UDP && ob.OriginalTarget.Address != nil {
+ 			strategy = strategy.GetDynamicStrategy(ob.OriginalTarget.Address.Family())
+ 		}
+-		ips, err := internet.LookupForIP(ob.Target.Address.Domain(), strategy, nil)
++		ips, err := internet.LookupForIPContext(ctx, ob.Target.Address.Domain(), strategy, nil)
+ 		if err != nil {
+ 			errors.LogInfoInner(ctx, err, "failed to resolve ip for target ", ob.Target.Address.Domain())
+ 			if h.senderSettings.TargetStrategy.ForceIP() {
+--- a/proxy/freedom/freedom.go
++++ b/proxy/freedom/freedom.go
+@@ -53,6 +53,7 @@
+ func init() {
+ 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
+ 		h := new(Handler)
++		h.dialerContext = ctx
+ 		if streamSettings, ok := session.StreamSettingsFromContext(ctx).(*internet.MemoryStreamConfig); ok && streamSettings.SocketSettings != nil {
+ 			h.resolveStrategy = streamSettings.SocketSettings.DomainStrategy
+ 			h.usesDialerProxy = len(streamSettings.SocketSettings.DialerProxy) > 0
+@@ -93,6 +94,7 @@
+ 
+ // Handler handles Freedom connections.
+ type Handler struct {
++	dialerContext   context.Context
+ 	policyManager   policy.Manager
+ 	config          *Config
+ 	finalRules      []*FinalRule
+@@ -299,7 +301,7 @@
+ 		if destination.Address.Family().IsDomain() {
+ 			if defaultRule != nil || len(h.finalRules) > 0 {
+ 				if strategy := h.resolveStrategy; strategy.HasStrategy() {
+-					ips, err := internet.LookupForIP(destination.Address.Domain(), strategy, outGateway)
++					ips, err := internet.LookupForIPContext(ctx, destination.Address.Domain(), strategy, outGateway)
+ 					if err != nil { // non-force may still dial with system DNS
+ 						errors.LogInfoInner(ctx, err, "failed to get IP address for domain ", destination.Address.Domain())
+ 						if strategy.ForceIP() {
+@@ -604,7 +606,7 @@
+ 				} else {
+ 					shouldUseSystemResolver := true
+ 					if strategy := w.Handler.resolveStrategy; strategy.HasStrategy() {
+-						ips, err := internet.LookupForIP(b.UDP.Address.Domain(), strategy, w.OutGateway)
++						ips, err := internet.LookupForIPContext(w.Handler.dialerContext, b.UDP.Address.Domain(), strategy, w.OutGateway)
+ 						if err != nil {
+ 							// drop packet if resolve failed when forceIP
+ 							if strategy.ForceIP() {
+--- a/transport/internet/grpc/dial.go
++++ b/transport/internet/grpc/dial.go
+@@ -119,6 +119,7 @@
+ 			}
+ 			address := net.ParseAddress(rawHost)
+ 
++			gctx = internet.CopyInstanceDialer(gctx, ctx)
+ 			gctx = c.ContextWithID(gctx, c.IDFromContext(ctx))
+ 			gctx = session.ContextWithOutbounds(gctx, session.OutboundsFromContext(ctx))
+ 			gctx = session.ContextWithTimeoutOnly(gctx, true)
+@@ -198,6 +199,17 @@
+ 		conn.Connect()
+ 	}
+ 	globalDialerMap[dialerConf{dest, streamSettings}] = conn
++	if state := internet.InstanceDialerFromContext(ctx); state != nil {
++		context.AfterFunc(state.Owner(), func() {
++			globalDialerAccess.Lock()
++			defer globalDialerAccess.Unlock()
++			key := dialerConf{dest, streamSettings}
++			if globalDialerMap[key] == conn {
++				delete(globalDialerMap, key)
++				_ = conn.Close()
++			}
++		})
++	}
+ 	return conn, err
+ }
+ 
+--- a/transport/internet/splithttp/dialer.go
++++ b/transport/internet/splithttp/dialer.go
+@@ -70,9 +70,26 @@
+ 		}
+ 
+ 		xmuxManager = NewXmuxManager(xmuxConfig, func() XmuxConn {
+-			return createHTTPClient(dest, streamSettings)
++			return createHTTPClient(ctx, dest, streamSettings)
+ 		})
+ 		globalDialerMap[key] = xmuxManager
++		if state := internet.InstanceDialerFromContext(ctx); state != nil {
++			context.AfterFunc(state.Owner(), func() {
++				globalDialerAccess.Lock()
++				defer globalDialerAccess.Unlock()
++				if globalDialerMap[key] == xmuxManager {
++					delete(globalDialerMap, key)
++					for _, client := range xmuxManager.xmuxClients {
++						if native, ok := client.XmuxConn.(*DefaultDialerClient); ok {
++							native.closed.Store(true)
++							native.client.CloseIdleConnections()
++						}
++						_ = common.Close(client.XmuxConn)
++					}
++					xmuxManager.xmuxClients = nil
++				}
++			})
++		}
+ 	}
+ 
+ 	xmuxClient := xmuxManager.GetXmuxClient(ctx)
+@@ -98,7 +115,7 @@
+ 	return "2"
+ }
+ 
+-func createHTTPClient(dest net.Destination, streamSettings *internet.MemoryStreamConfig) DialerClient {
++func createHTTPClient(ownerCtx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) DialerClient {
+ 	tlsConfig := tls.ConfigFromStreamSettings(streamSettings)
+ 	realityConfig := reality.ConfigFromStreamSettings(streamSettings)
+ 
+@@ -116,6 +133,7 @@
+ 	transportConfig := streamSettings.ProtocolSettings.(*Config)
+ 
+ 	dialContext := func(ctxInner context.Context) (net.Conn, error) {
++		ctxInner = internet.CopyInstanceDialer(ctxInner, ownerCtx)
+ 		var conn net.Conn
+ 		var err error
+ 		if streamSettings.FinalMask != nil {
+@@ -127,6 +145,10 @@
+ 			return nil, err
+ 		}
+ 
++		if state := internet.InstanceDialerFromContext(ownerCtx); state != nil {
++			rawConn := conn
++			context.AfterFunc(state.Owner(), func() { _ = rawConn.Close() })
++		}
+ 		if realityConfig != nil {
+ 			return reality.UClient(conn, realityConfig, ctxInner, dest)
+ 		}
+@@ -192,6 +214,7 @@
+ 			QUICConfig:      quicConfig,
+ 			TLSClientConfig: gotlsConfig,
+ 			Dial: func(ctx context.Context, addr string, tlsCfg *gotls.Config, cfg *quic.Config) (*quic.Conn, error) {
++				ctx = internet.CopyInstanceDialer(ctx, ownerCtx)
+ 				var pktConn net.PacketConn
+ 				var udpAddr net.Addr
+ 				if streamSettings.FinalMask != nil {
+--- a/app/observatory/observer.go
++++ b/app/observatory/observer.go
+@@ -39,7 +39,10 @@
+ }
+ 
+ func (o *Observer) GetObservation(ctx context.Context) (proto.Message, error) {
+-	return &ObservationResult{Status: o.status}, nil
++	o.statusLock.Lock()
++	defer o.statusLock.Unlock()
++	// Consumers retain the snapshot after this call; clone status messages too.
++	return proto.Clone(&ObservationResult{Status: o.status}), nil
+ }
+ 
+ func (o *Observer) Type() interface{} {
