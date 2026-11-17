@@ -3,7 +3,12 @@
     "module": "Go standard library and runtime",
     "version": "1.27.3",
     "notices": {
-      "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+      "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "src/crypto/internal/boring/LICENSE": "56210f826b8f0fbac3160dfe55c97f4019eb6cdda3963b5a0eab8a8bdb62360e",
+      "src/vendor/golang.org/x/crypto/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "src/vendor/golang.org/x/net/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "src/vendor/golang.org/x/sys/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "src/vendor/golang.org/x/text/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
     }
   },
   {
@@ -66,7 +71,9 @@
     "module": "github.com/klauspost/compress",
     "version": "v1.20.3",
     "notices": {
-      "LICENSE": "0d9e582ee4bff57bf1189c9e514e6da7ce277f9cd3bc2d488b22fbb39a6d87cf"
+      "LICENSE": "0d9e582ee4bff57bf1189c9e514e6da7ce277f9cd3bc2d488b22fbb39a6d87cf",
+      "internal/snapref/LICENSE": "f69f157b0be75da373605dbc8bbf142e8924ee82d8f44f11bcaf351335bf98cf",
+      "zstd/internal/xxhash/LICENSE.txt": "f566a9f97bacdaf00d9f21dd991e81dc11201c4e016c86b470799429a1c9a79c"
     }
   },
   {
@@ -192,7 +199,8 @@
     "module": "github.com/refraction-networking/utls",
     "version": "v1.8.3-0.20260301010127-aa6edf4b11af",
     "notices": {
-      "LICENSE": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+      "LICENSE": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067",
+      "dicttls/LICENSE": "ac089a3cb515b32ba1c8c2b401646527f55815a9022013693d515f2e2e4fb6ec"
     }
   },
   {
@@ -228,7 +236,8 @@
     "module": "github.com/xtls/xray-core",
     "version": "v1.260327.1-0.20261031132019-a4a3dff5b20c",
     "notices": {
-      "LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+      "LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+      "transport/internet/masque/connectip/LICENSE": "8bcbabf56e2d09741d209292f583cc1d0fe3c894040a03b972a656da87beeddf"
     }
   },
   {
