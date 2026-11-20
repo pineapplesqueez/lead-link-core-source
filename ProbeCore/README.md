@@ -4,6 +4,10 @@ Lead Link runs at most eight complete Xray profiles concurrently (`maximumProbes
 
 `main.go` adds four internal Invoke v3 methods: `leadlink.startProbe` returns an opaque ownership token, `leadlink.stopProbe` closes only that token, `leadlink.probeState` reports active/peak instance counts, and `leadlink.probeObservation` returns readiness/revision/budget for that token. Observation responses contain no tags, URLs, keys or native errors. Existing methods delegate to pinned libXray. Managed start/test/ping operations are rejected while probes exist; probe start rejects an existing managed runtime. Lifecycle mutations are serialized, while the requests and observers run concurrently. The limit is enforced in the model, Swift worker pool and Go adapter.
 
+## macOS sandbox entitlement
+
+Each probe listens on `127.0.0.1` with an ephemeral port and per-probe SOCKS credentials, and the app's URLSession connects to it. In the macOS App Sandbox this needs `com.apple.security.network.server` in addition to `network.client`: checked on 19 November 2026 with an ad-hoc signed sandboxed binary, `bind()` on `127.0.0.1` fails with `EPERM` without it and succeeds with it. Keep the entitlement on the macOS app (not the tunnel extension) while the probe uses a loopback inbound; TV reception runs only on tvOS and does not need it.
+
 ## Isolation overlay
 
 This is an app-only adaptation of the pinned upstream, not the old Lead VPN patch set. `isolation.patch` changes eight Xray files:
