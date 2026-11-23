@@ -17,16 +17,20 @@ import (
 	"github.com/xtls/xray-core/common/platform"
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/transport/internet"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"unsafe"
 )
 
 type probeEntry struct {
-	core   *core.Instance
-	cancel context.CancelFunc
-	health *probeHealth
+	core     *core.Instance
+	cancel   context.CancelFunc
+	health   *probeHealth
+	ctx      context.Context
+	proxyURL *url.URL
 }
 
 // Concurrent probe instances. Keep equal to ProfileLatencyProbe.concurrency.
@@ -174,7 +178,7 @@ func startProbe(text string) (string, error) {
 		return "", reject
 	}
 	id := hex.EncodeToString(raw[:])
-	probes[id] = probeEntry{instance, cancel, newProbeHealth(root)}
+	probes[id] = probeEntry{core: instance, cancel: cancel, health: newProbeHealth(root), ctx: ctx, proxyURL: &url.URL{Scheme: "socks5h", Host: "127.0.0.1:" + strconv.Itoa(in.Port), User: url.UserPassword(in.Settings.Accounts[0].User, in.Settings.Accounts[0].Pass)}}
 	if len(probes) > maximumActive {
 		maximumActive = len(probes)
 	}

@@ -62,9 +62,9 @@ Native-проверки выполняются на Apple Silicon Mac. Тест�
 
 ## Готовые фреймворки
 
-Собранные `LibXray.xcframework` и `ProbeCore.xcframework` не хранятся в Git: это ~300 МБ на каждый и они воспроизводимо собираются из закреплённых исходников. Их zip-архивы лежат в приватном GitHub Release; тег и SHA-256 записаны в `Core/prebuilt.lock.json`.
+Собранные `LibXray.xcframework` и `ProbeCore.xcframework` не хранятся в Git: это ~300 МБ на каждый и они воспроизводимо собираются из закреплённых исходников. Для LibXray тег релиза и SHA-256 записаны в `Core/prebuilt.lock.json`. Версия ProbeCore для iOS 15 собирается из исходников текущей ревизии.
 
-- `python3 scripts/fetch-prebuilt-core.py` — скачать, сверить SHA-256 и распаковать в `Artifacts/`.
+- `python3 scripts/fetch-prebuilt-core.py` — восстановить закреплённые архивы и собрать ProbeCore из исходников, если в lock отсутствует его архив.
 - `python3 scripts/publish-core.py` — после пересборки любого ядра выложить новый релиз и обновить lock; затем закоммитить `Core/prebuilt.lock.json`.
 
 LibXray — неизменённый upstream; ProbeCore содержит app-only overlay (см. `Core/ProbeCore/README.md`), его соответствующие исходники распространяются пакетом `scripts/package-open-source.py`.

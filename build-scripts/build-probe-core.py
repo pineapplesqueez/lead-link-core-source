@@ -14,11 +14,13 @@ version=subprocess.check_output([str(go),'version'],text=True).strip()
 assert f'go{lock["go"]} ' in version
 module=root/'Core/ProbeCore';work=root/'.build/probe-core'
 cache=(root/'.cache/core/modules').resolve()
+env=dict(os.environ,PATH=str(go.parent)+os.pathsep+os.environ['PATH'],GOTOOLCHAIN='local',GOWORK='off',GOMODCACHE=str(cache),GOCACHE=str(work/'go-cache'))
+subprocess.run(['python3',str(root/'scripts/verify-upstream.py')],check=True)
+subprocess.run([str(go),'mod','download'],cwd=root/'Vendor/libXray',env=env,check=True)
 source=cache/f'github.com/xtls/xray-core@{lock["xray_core"]["module_version"]}'
 files=json.loads((module/'upstream-files.json').read_text())
 for name,digest in files.items():
  assert hashlib.sha256((source/name).read_bytes()).hexdigest()==digest, 'Upstream overlay input changed: '+name
-subprocess.run(['python3',str(root/'scripts/verify-upstream.py')],check=True)
 copy=work/'upstream'
 if not copy.exists():shutil.copytree(source,copy)
 for p in source.rglob('*'):
@@ -31,7 +33,6 @@ for name in files:
  p=overlay/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source/name,p);p.chmod(0o644)
 subprocess.run(['patch','--batch','-p1','-i',str(module/'isolation.patch')],cwd=overlay,check=True,stdout=subprocess.DEVNULL)
 manifest=work/'overlay.json';manifest.write_text(json.dumps({'Replace':{str(copy/n):str(overlay/n) for n in files}}))
-env=dict(os.environ,PATH=str(go.parent)+os.pathsep+os.environ['PATH'],GOTOOLCHAIN='local',GOWORK='off',GOMODCACHE=str(cache),GOCACHE=str(work/'go-cache'))
 subprocess.run([str(go),'mod','verify'],cwd=module,env=env,check=True,stdout=subprocess.DEVNULL)
 graph=subprocess.check_output([str(go),'list','-mod=readonly','-m','-f','{{.Path}} {{.Version}}','all'],cwd=module,env=env,text=True)
 modules={line.strip() for line in graph.splitlines() if not line.startswith('leadlink.local/probecore')}
@@ -44,7 +45,7 @@ if args.test or args.race:
  raise SystemExit(0)
 targets=[('macosx','darwin','arm64','arm64','15.0')]
 if not args.mac_only:
- targets += [('macosx','darwin','amd64','x86_64','15.0'),('iphoneos','ios','arm64','arm64','18.0'),('iphonesimulator','ios','arm64','arm64','18.0'),('iphonesimulator','ios','amd64','x86_64','18.0'),('appletvos','ios','arm64','arm64','18.0'),('appletvsimulator','ios','arm64','arm64','18.0'),('appletvsimulator','ios','amd64','x86_64','18.0')]
+ targets += [('macosx','darwin','amd64','x86_64','15.0'),('iphoneos','ios','arm64','arm64','15.0'),('iphonesimulator','ios','arm64','arm64','15.0'),('iphonesimulator','ios','amd64','x86_64','15.0'),('appletvos','ios','arm64','arm64','18.0'),('appletvsimulator','ios','arm64','arm64','18.0'),('appletvsimulator','ios','amd64','x86_64','18.0')]
 products={}
 for sdk,goos,goarch,arch,minimum in targets:
  out=work/f'{sdk}-{arch}';out.mkdir(exist_ok=True)

@@ -15,7 +15,7 @@ args = parser.parse_args()
 name = 'ProbeCore.xcframework' if args.probe else 'LibXray.xcframework'
 framework = root / 'Artifacts' / name
 info = plistlib.loads((framework / 'Info.plist').read_bytes())
-expected = {('ios', ''): ({'arm64'}, 2, 18), ('ios', 'simulator'): ({'arm64', 'x86_64'}, 7, 18),
+expected = {('ios', ''): ({'arm64'}, 2, 15), ('ios', 'simulator'): ({'arm64', 'x86_64'}, 7, 15),
             ('macos', ''): ({'arm64', 'x86_64'}, 1, 15), ('tvos', ''): ({'arm64'}, 3, 18),
             ('tvos', 'simulator'): ({'arm64', 'x86_64'}, 8, 18)}
 assert len(info['AvailableLibraries']) == 5
@@ -28,10 +28,14 @@ for lib in info['AvailableLibraries']:
     assert set(subprocess.check_output(['lipo', '-archs', binary], text=True).split()) == arches
     loads = subprocess.check_output(['xcrun', 'otool', '-l', binary], text=True)
     assert {int(p) for p in re.findall(r'^\s*platform (\d+)$', loads, re.M)} == {platform}, key
-    assert all(float(v) <= minimum for v in re.findall(r'^\s*minos (\d+\.\d+)$', loads, re.M)), key
+    versions = re.findall(r'^\s*minos (\d+(?:\.\d+){0,2})$', loads, re.M)
+    assert versions and all(tuple(map(int, v.split('.'))) <= (minimum, 0, 0) for v in versions), key
     for arch in sorted(arches):
         symbols = subprocess.check_output(['xcrun', 'nm', '-arch', arch, '-gU', binary], text=True, stderr=subprocess.DEVNULL)
-        for symbol in ('_CGoInvoke', '_CGoFree'):
+        required = ['_CGoInvoke', '_CGoFree']
+        if args.probe:
+            required += ['_CGoNewProbeRequest', '_CGoCancelProbeRequest', '_CGoRunProbeRequest', '_CGoFreeProbeRequest']
+        for symbol in required:
             assert len(re.findall(r'\bT ' + symbol + r'$', symbols, re.M)) == 1, (key, arch, symbol)
     print(f'{key}: architectures, platform, minimum OS and C ABI passed.')
 assert not expected
