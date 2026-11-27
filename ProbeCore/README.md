@@ -12,8 +12,9 @@ Each probe listens on `127.0.0.1` with an ephemeral port and per-probe SOCKS cre
 
 ## Isolation overlay
 
-This is an app-only adaptation of the pinned upstream, not the old Lead VPN patch set. `isolation.patch` changes eight Xray files:
+This is an app-only adaptation of the pinned upstream, not the old Lead VPN patch set. `isolation.patch` changes nine Xray files:
 
+- Synchronize Observatory error collection and keep returned error reports immutable while outbound workers finish.
 - Bind system DNS and `dialerProxy` lookup to the owning instance through context, including freedom UDP and target resolution.
 - Preserve that context across detached, gRPC and XHTTP dialing contexts.
 - Remove each instance's gRPC/XHTTP cache entries and close its connections on cancellation. XHTTP raw upload sockets and idle clients are included.
@@ -23,9 +24,9 @@ This is an app-only adaptation of the pinned upstream, not the old Lead VPN patc
 
 No routing rules, outbound tags, balance strategies, fallback tags or observer selectors are replaced. The request follows the profile's policy: a direct rule for the HTTPS endpoint yields a direct-route measurement. Existing compiler restrictions on unsupported profiles still apply.
 
-The first request starts immediately with its five-second budget. For a used, observed balancer that initially has incomplete health information, a failed/timed-out request and a transition to usable observations grant **one** fresh request through the unchanged router, using a new URLSession so an old SOCKS/HTTP2 connection cannot pin it to the dead outbound. Readiness alone never cancels an in-flight request: a healthy slow handshake must be allowed to finish. Each attempt has its own completion signal; late callbacks cannot finish the next attempt. A successful HTTP 204 remains required. Observation readiness itself never reports success, and there is no fixed warmup delay.
+The first request starts immediately with a default seven-second budget. For a used, observed balancer that initially has incomplete health information, a failed/timed-out request and a transition to usable observations grant **one** fresh request through the unchanged router, using a new URLSession so an old SOCKS/HTTP2 connection cannot pin it to the dead outbound. Readiness alone never cancels an in-flight request: a healthy slow handshake must be allowed to finish. Each attempt has its own completion signal; late callbacks cannot finish the next attempt. A successful HTTP 204 remains required. Observation readiness itself never reports success, and there is no fixed warmup delay.
 
-Observation waiting is bounded by twice the configured burst timeout (default 2 × 5s, capped at 10s), or 10s for ordinary observatory, plus 250ms to publish results; burst may perform a second direct-connectivity check before publishing failure. It is also capped at twice the requested timeout plus 250ms. The request after recovery gets up to another five seconds. Default burst and ordinary observation have a 15.25s network/warmup bound, excluding core startup/cleanup and queue time. Healthy requests finish immediately. Custom very slow or sequential provider observers can still exceed these bounded waits; we do not change their intervals, selectors or concurrency. The probe returns the duration of the successful request, excluding the wait. The app displays an estimated latency by dividing those milliseconds by 3.3 and rounding to the nearest millisecond, with a minimum of 1 ms.
+Observation waiting is bounded by twice the configured burst timeout (default 2 × 5s, capped at 10s), or 10s for ordinary observatory, plus 250ms to publish results; burst may perform a second direct-connectivity check before publishing failure. It is also capped at twice the requested timeout plus 250ms. The request after recovery gets up to another seven seconds by default. Default burst and ordinary observation have a 17.25s network/warmup bound, excluding core startup/cleanup and queue time. Healthy requests finish immediately. Custom very slow or sequential provider observers can still exceed these bounded waits; we do not change their intervals, selectors or concurrency. The probe returns the duration of the successful request, excluding the wait. The app displays an estimated latency by dividing those milliseconds by 3.3 and rounding to the nearest millisecond, with a minimum of 1 ms.
 
 `upstream-files.json` pins the original input hashes. The build copies upstream into `.build`, applies a Go overlay and leaves Vendor, the module cache and the tunnel binary unchanged. The Go module graph must match `Core/modules.lock.txt` apart from this wrapper. Upgrade upstream only after reviewing the overlay against the new source and rerunning isolation tests.
 
@@ -43,7 +44,7 @@ python3 scripts/verify-model.py
 ./scripts/verify.sh
 ```
 
-The test server is built by `scripts/build-core.py --go .cache/toolchains/go-1.27.3/go/bin/go --mac-only --test-server`. Go tests use only synthetic local configurations. Tests cover identical tags with distinct DNS/route/chain behavior, gRPC/XHTTP DNS isolation, rejected fourth start, managed overlap, failed start, cancellation/refill and independent cleanup. Swift tests exercise three simultaneous full profiles with direct/leastPing/leastLoad rules and cancellation through the actual URLSession/SOCKS path.
+The test server is built by `scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go --mac-only --test-server`. Go tests use only synthetic local configurations. Tests cover identical tags with distinct DNS/route/chain behavior, gRPC/XHTTP DNS isolation, rejected fourth start, managed overlap, failed start, cancellation/refill and independent cleanup. Swift tests exercise three simultaneous full profiles with direct/leastPing/leastLoad rules and cancellation through the actual URLSession/SOCKS path.
 
 Outputs: `Artifacts/ProbeCore.xcframework` (five SDK variants, eight architecture/platform combinations) and `Artifacts/ProbeNativeSmoke`. Provenance records adapter/patch/module hashes, pinned versions and artifact hashes. The static framework has a distinct module/product name so Xcode never combines or overwrites it with LibXray. `--mac-only` builds the native test archive only.
 

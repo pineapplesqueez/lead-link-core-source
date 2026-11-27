@@ -11,7 +11,7 @@
 
 This repository provides the corresponding source for the core components used in **Lead Link**, maintained by **ADAPTA SIA**. It includes the original tunnel core and the modified core used for concurrent profile latency checks.
 
-The source here matches the core in **Lead Link 1.0.0 (8)**. Documentation updates do not imply a new application build or a newer upstream core.
+This snapshot contains the Xray-core and libXray v26.11.9 sources used to build the Lead Link tunnel and latency adapter.
 
 > This is a core source distribution, not the complete Lead Link application or an installable VPN client. The app's interface, storage layer, and TV transfer implementation are outside this package.
 
@@ -31,10 +31,11 @@ The source here matches the core in **Lead Link 1.0.0 (8)**. Documentation updat
 
 | Component | Version |
 | --- | --- |
-| Xray-core | **v26.10.31** · commit [`a4a3dff5b20c`](https://github.com/XTLS/Xray-core/commit/a4a3dff5b20c) |
-| libXray | Commit [`7fe8528063e54343af8ba9a37431afc56000de21`](https://github.com/XTLS/libXray/commit/7fe8528063e54343af8ba9a37431afc56000de21) |
-| Go | **1.27.3** |
-| Xray isolation overlay | **8 modified files**, used by ProbeCore only |
+| Xray-core | **v26.11.9** · commit [`676eaf66f8f0`](https://github.com/XTLS/Xray-core/commit/676eaf66f8f0) |
+| libXray | **v26.11.9** · commit [`5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3`](https://github.com/XTLS/libXray/commit/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3) |
+| Go | **1.27.4** |
+| GeoIP Lite / GeoSite | [Xray-rules-dat 20261127013728](https://github.com/XTLS/Xray-rules-dat/releases/tag/20261127013728) |
+| Xray isolation overlay | **9 modified files**, used by ProbeCore only |
 
 The authoritative records are [upstream.lock.json](upstream.lock.json), [modules.lock.txt](modules.lock.txt), and [go-toolchain.lock.json](go-toolchain.lock.json). They pin the sources and dependency graph rather than following upstream `main`.
 
@@ -104,7 +105,7 @@ Fetch and verify the pinned toolchain and the complete official libXray archive,
 python3 scripts/bootstrap-go.py
 python3 scripts/fetch-core.py
 python3 scripts/verify-upstream.py
-python3 scripts/build-core.py --go .cache/toolchains/go-1.27.3/go/bin/go
+python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go
 python3 scripts/verify-core.py
 python3 scripts/build-probe-core.py --test --race
 python3 scripts/build-probe-core.py
@@ -121,7 +122,7 @@ The [integration notes](INTEGRATION.md) (Russian) and [ProbeCore notes](ProbeCor
 
 ## Licenses and attribution
 
-- **Xray-core:** [MPL-2.0](Xray-core-original/LICENSE). The eight modified Xray files remain under [MPL-2.0](Xray-core-probe/LICENSE), with their existing notices preserved.
+- **Xray-core:** [MPL-2.0](Xray-core-original/LICENSE). The nine modified Xray files remain under [MPL-2.0](Xray-core-probe/LICENSE), with their existing notices preserved.
 - **libXray:** [MIT](libXray/LICENSE).
 - **Other components:** consult [ThirdPartyNotices.txt](ThirdPartyNotices.txt), [licenses.lock.json](licenses.lock.json), [GeodataLicenses](GeodataLicenses/), and the notices in individual files. This repository does not assign one blanket license to every component.
 
@@ -131,6 +132,8 @@ The modified Xray source is published here directly, alongside its patch and ori
 
 | Snapshot | Scope |
 | --- | --- |
+| [core-26.11.9](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9) | Xray-core and libXray 26.11.9, Go 1.27.4 and the matching ProbeCore overlay. |
+| [build-1.1.0-10](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-1.1.0-10) | Corresponding sources for Lead Link iOS 1.1.0 (10). |
 | Documentation update · 20 November 2026 | English and Russian README pages, repository presentation, and the macOS loopback entitlement explanation. Core code unchanged. |
 | [source-audit-2026-11-17](https://github.com/pineapplesqueez/lead-link-core-source/releases/tag/source-audit-2026-11-17) | Completed source inventory and nested dependency notices; fixed files omitted by upstream ignore rules. |
 | [build-0.1.0-4](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-0.1.0-4) | Historical source snapshot, retained for traceability. |

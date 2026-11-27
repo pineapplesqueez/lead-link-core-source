@@ -40,6 +40,11 @@ for lib in info['AvailableLibraries']:
     print(f'{key}: architectures, platform, minimum OS and C ABI passed.')
 assert not expected
 provenance = json.loads((root / 'Artifacts' / (name + '.provenance.json')).read_text())
+lock = json.loads((root / 'Core/upstream.lock.json').read_text())
+assert provenance['go'].split()[2] == 'go' + lock['go'], 'Framework toolchain differs from the pinned Go version'
+if not args.probe:
+    assert provenance['libxray_commit'] == lock['libxray']['commit'], 'Tunnel framework differs from pinned libXray'
+    assert provenance['modules_sha256'] == hashlib.sha256((root / 'Core/modules.lock.txt').read_bytes()).hexdigest()
 for name, digest in provenance['files'].items():
     assert hashlib.sha256((framework / name).read_bytes()).hexdigest() == digest, name
 print('Binary hashes match build provenance.')

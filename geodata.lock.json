@@ -1,13 +1,15 @@
 {
-  "release": "v26.10.31",
-  "archive_url": "https://github.com/XTLS/Xray-core/releases/download/v26.10.31/Xray-macos-arm64-v8a.zip",
-  "archive_sha256": "0a05dca3bd311b0bc5a89c7ce56350cab1e829e131e4b2bcd48eb304fac07e9a",
+  "release": "20261127013728",
   "data_source": "https://github.com/XTLS/Xray-rules-dat",
-  "license_commit": "b40845fed59ac2dd60c9c5f7b598dce2b5a2d46f",
-  "files": {
-    "geoip.dat": "ce90dc02a81528109c99d769e1f8fe3071ded6b02a574f31e62d8f4eee312563",
-    "geosite.dat": "9ee94acb06e2f795831fb1589c0dc7af9242b0fb8d9196afd981b915b1097ed3"
+  "assets": {
+    "geoip.dat": "https://github.com/XTLS/Xray-rules-dat/releases/download/20261127013728/geoip-lite.dat",
+    "geosite.dat": "https://github.com/XTLS/Xray-rules-dat/releases/download/20261127013728/geosite.dat"
   },
+  "files": {
+    "geoip.dat": "a36326fddd965ebaf2cbfd84dec36074caa7df916dde3ce22aa5a80bcca746cc",
+    "geosite.dat": "919a4b32cc9e6619e5bc17831cd388f89df77d9bf9817dab98b489d479162047"
+  },
+  "license_commit": "0f8082e3b11bbe8ee65f26de86cbd2e0d510c983",
   "licenses": {
     "LICENSE-GeoSite-inherit": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2",
     "LICENSE-GeoSite": "4d3730dbc49d4cde94cc9adb07e29dbf4afefac68705af830809b8b464425719",

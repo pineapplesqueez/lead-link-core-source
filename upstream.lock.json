@@ -1,25 +1,26 @@
 {
   "schema": 1,
-  "audited_at": "2026-11-03",
-  "status": "integrated-e1-macos-validated-device-matrix-pending",
+  "audited_at": "2026-11-27",
+  "status": "stable-release-pair",
   "libxray": {
     "repository": "https://github.com/XTLS/libXray",
-    "commit": "7fe8528063e54343af8ba9a37431afc56000de21",
-    "archive_url": "https://codeload.github.com/XTLS/libXray/tar.gz/7fe8528063e54343af8ba9a37431afc56000de21",
-    "archive_sha256": "738a99755c184923fcc5aaede114953bef8156f4bf918c1977ab0743739a1bf5"
+    "commit": "5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3",
+    "archive_url": "https://codeload.github.com/XTLS/libXray/tar.gz/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3",
+    "archive_sha256": "10b0c62e4a69db89ba9a7dd155980dbd912d49b1c3dd7a1f93de2fededf90ca8",
+    "release": "v26.11.9"
   },
   "xray_core": {
     "repository": "https://github.com/XTLS/Xray-core",
-    "commit_prefix": "a4a3dff5b20c",
-    "release": "v26.10.31",
-    "module_version": "v1.260327.1-0.20261031132019-a4a3dff5b20c"
+    "commit_prefix": "676eaf66f8f0",
+    "release": "v26.11.9",
+    "module_version": "v1.260327.1-0.20261109052709-676eaf66f8f0"
   },
-  "go": "1.27.3",
+  "go": "1.27.4",
   "abi": "CGoInvoke/CGoFree",
   "invoke_api_version": 3,
   "manifest_sha256": {
-    "go.mod": "1fe73acfc43c45f41fbd5aece6a12f259867892038fb6ad3604ecdfc1b292afc",
-    "go.sum": "be2bf91f51bf0c6520511794a768adea74aa55bcd56e44a34d205743a26c7269"
+    "go.mod": "6cae0b0bb7f8fb6718b7e357ce28103161949c803901f7233bd9a8a862f56b02",
+    "go.sum": "58316bacf36b73b49d1c9e0a127f57e5e96340c444746956bb88b2df606d7e79"
   },
   "local_patches": []
 }

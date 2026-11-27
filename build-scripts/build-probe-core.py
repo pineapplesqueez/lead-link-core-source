@@ -21,7 +21,7 @@ source=cache/f'github.com/xtls/xray-core@{lock["xray_core"]["module_version"]}'
 files=json.loads((module/'upstream-files.json').read_text())
 for name,digest in files.items():
  assert hashlib.sha256((source/name).read_bytes()).hexdigest()==digest, 'Upstream overlay input changed: '+name
-copy=work/'upstream'
+copy=work/('upstream-'+lock['xray_core']['commit_prefix'])
 if not copy.exists():shutil.copytree(source,copy)
 for p in source.rglob('*'):
  if p.is_file():
@@ -31,7 +31,7 @@ overlay=work/'overlay'
 if overlay.exists():shutil.rmtree(overlay)
 for name in files:
  p=overlay/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source/name,p);p.chmod(0o644)
-subprocess.run(['patch','--batch','-p1','-i',str(module/'isolation.patch')],cwd=overlay,check=True,stdout=subprocess.DEVNULL)
+subprocess.run(['patch','--batch','--fuzz=0','-p1','-i',str(module/'isolation.patch')],cwd=overlay,check=True,stdout=subprocess.DEVNULL)
 manifest=work/'overlay.json';manifest.write_text(json.dumps({'Replace':{str(copy/n):str(overlay/n) for n in files}}))
 subprocess.run([str(go),'mod','verify'],cwd=module,env=env,check=True,stdout=subprocess.DEVNULL)
 graph=subprocess.check_output([str(go),'list','-mod=readonly','-m','-f','{{.Path}} {{.Version}}','all'],cwd=module,env=env,text=True)

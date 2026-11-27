@@ -58,7 +58,7 @@ def collect(root, go):
                 elif package.get('Standard') and package.get('Dir'):
                     add('Go standard library and runtime', lock['go'], goroot, package['Dir'])
 
-    sections = ['Lead Link — third-party notices\n\nThe VPN extension includes unmodified libXray and Xray-core. The app probe core includes a Lead Link isolation overlay; its modified files are distributed under MPL-2.0.\nCorresponding source of the core components (original and modified Xray-core, libXray, ProbeCore, exact versions and build scripts): https://github.com/pineapplesqueez/lead-link-core-source\nXray-core source: https://github.com/XTLS/Xray-core/tree/a4a3dff5b20c\nlibXray source: https://github.com/XTLS/libXray/tree/7fe8528063e54343af8ba9a37431afc56000de21\n']
+    sections = [f'Lead Link — third-party notices\n\nThe VPN extension includes unmodified libXray and Xray-core. The app probe core includes a Lead Link isolation overlay; its modified files are distributed under MPL-2.0.\nCorresponding source of the core components (original and modified Xray-core, libXray, ProbeCore, exact versions and build scripts): https://github.com/pineapplesqueez/lead-link-core-source\nXray-core source: https://github.com/XTLS/Xray-core/tree/{lock["xray_core"]["commit_prefix"]}\nlibXray source: https://github.com/XTLS/libXray/tree/{lock["libxray"]["commit"]}\n']
     manifest = []
     for name, module in sorted(modules.items()):
         notices = {}
@@ -77,7 +77,7 @@ def collect(root, go):
         manifest.append({'module': name, 'version': module['version'],
                          'notices': {path: hashlib.sha256(data).hexdigest() for path, data in sorted(notices.items())}})
     geo = json.loads((root / 'Core/geodata.lock.json').read_text())
-    sections.append('\n' + '=' * 72 + '\nBundled Xray geoip/geosite data, Xray ' + geo['release'] + '\nData and source: ' + geo['data_source'] + '\nPinned provenance: Core/geodata.lock.json\n')
+    sections.append('\n' + '=' * 72 + '\nBundled Xray geoip/geosite data, Xray-rules-dat ' + geo['release'] + '\nData and source: ' + geo['data_source'] + '\nPinned provenance: Core/geodata.lock.json\n')
     for name, expected in sorted(geo['licenses'].items()):
         file = root / 'Core/GeodataLicenses' / name
         if hashlib.sha256(file.read_bytes()).hexdigest() != expected:

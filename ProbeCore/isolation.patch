@@ -162,7 +162,7 @@
  			if h.senderSettings.TargetStrategy.ForceIP() {
 --- a/proxy/freedom/freedom.go
 +++ b/proxy/freedom/freedom.go
-@@ -53,6 +53,7 @@
+@@ -54,6 +54,7 @@
  func init() {
  	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
  		h := new(Handler)
@@ -170,7 +170,7 @@
  		if streamSettings, ok := session.StreamSettingsFromContext(ctx).(*internet.MemoryStreamConfig); ok && streamSettings.SocketSettings != nil {
  			h.resolveStrategy = streamSettings.SocketSettings.DomainStrategy
  			h.usesDialerProxy = len(streamSettings.SocketSettings.DialerProxy) > 0
-@@ -93,6 +94,7 @@
+@@ -97,6 +98,7 @@
  
  // Handler handles Freedom connections.
  type Handler struct {
@@ -178,7 +178,7 @@
  	policyManager   policy.Manager
  	config          *Config
  	finalRules      []*FinalRule
-@@ -299,7 +301,7 @@
+@@ -321,7 +323,7 @@
  		if destination.Address.Family().IsDomain() {
  			if defaultRule != nil || len(h.finalRules) > 0 {
  				if strategy := h.resolveStrategy; strategy.HasStrategy() {
@@ -187,7 +187,7 @@
  					if err != nil { // non-force may still dial with system DNS
  						errors.LogInfoInner(ctx, err, "failed to get IP address for domain ", destination.Address.Domain())
  						if strategy.ForceIP() {
-@@ -604,7 +606,7 @@
+@@ -626,7 +628,7 @@
  				} else {
  					shouldUseSystemResolver := true
  					if strategy := w.Handler.resolveStrategy; strategy.HasStrategy() {
@@ -304,3 +304,25 @@
  }
  
  func (o *Observer) Type() interface{} {
+--- a/app/observatory/explainErrors.go
++++ b/app/observatory/explainErrors.go
+@@ -3 +3,5 @@
+-import "github.com/xtls/xray-core/common/errors"
++import (
++	"sync"
++
++	"github.com/xtls/xray-core/common/errors"
++)
+@@ -5,0 +10 @@
++	mu     sync.Mutex
+@@ -9,0 +15,2 @@
++	e.mu.Lock()
++	defer e.mu.Unlock()
+@@ -14 +21,3 @@
+-	e.errors = e.errors.Base(errors.New("underlying connection error").Base(err))
++	// UnderlyingError may already have returned the previous report. Do not mutate it.
++	previous := *e.errors
++	e.errors = previous.Base(errors.New("underlying connection error").Base(err))
+@@ -21,0 +31,2 @@
++	e.mu.Lock()
++	defer e.mu.Unlock()

@@ -16,7 +16,7 @@
 
 依赖 git 和 go。
 
-默认情况下，编译脚本不会 clone [Xray-core](https://github.com/XTLS/Xray-core)，而是通过 Go modules 的 pseudo-version 将 Xray-core 固定到发布版本 `v26.10.31`。
+默认情况下，编译脚本不会 clone [Xray-core](https://github.com/XTLS/Xray-core)，而是通过 Go modules 的 pseudo-version 将 Xray-core 固定到发布版本 `v26.11.9`。
 传入可选参数 `local` 时，会通过 Go module `replace` 改用已有的本地仓库 `../Xray-core`。
 
 ### 使用方式
@@ -48,15 +48,30 @@ gomobile 默认解析 `latest`，
 也可通过环境变量 `LIBXRAY_GOMOBILE_VERSION` 指定 Go 模块版本；`gomobile` 与
 `gobind` 使用同一个解析版本。
 
+设置 `LIBXRAY_ANDROID_API` 可提高 Android API 级别（默认 21），该值也是 AAR 的
+`minSdkVersion`。此时库的重定位占用空间更小：不低于 23 时为压缩格式
+（`--pack-dyn-relocs=android`），不低于 28 时为 RELR（`DT_ANDROID_RELR`）。
+
 Linux 和 Windows 构建还会生成 `bin/xray` 或 `bin/xray.exe`。该会话 Core
-会保护 Go DNS 查询不被 VPN 路由重新捕获，并且只接受以下命令：
+可保护 Go DNS 查询不被 VPN 路由重新捕获，并接受以下命令：
 
 ```shell
-xray run -dns <IP:port> -interface <网卡名> -config <xray.json> [-error-file <路径>]
+xray run -config <xray.json> [-set-dns=true|false] [-dns <IP:port> -interface <网卡名>] [-error-file <路径>]
 ```
 
-`-dns`、`-interface`、`-config` 均必须提供。`-dns` 必须是 IP endpoint，`-config` 直接指向 Xray
-JSON 配置。
+`-config` 始终必须提供，直接指向 Xray JSON 配置。`-set-dns` 默认为 `true`，
+保留现有行为：必须提供 `-dns` 和 `-interface`，`-dns` 必须是 IP endpoint；Core
+停止或启动失败后恢复原解析器。
+
+使用 `-set-dns=false` 可同时跳过 `SetDNS` 和 `ResetDNS`，由 Core 管理解析器。
+此时可以省略 `-dns`、`-interface`，即使提供也不会使用。布尔参数使用等号传值：
+
+```shell
+xray run -set-dns=false -config xray.json
+```
+
+该开关仅控制 libXray 的进程解析器覆盖；Core 的 DNS、TUN、出站网卡和 WFP
+设置仍由 JSON 配置决定。
 
 可选的 `-error-file` 将命令失败时打印到 stderr 的原始错误同时写入 UTF-8 文件，
 随后退出。运行前清空文件，成功时保持为空；父目录必须已经存在。通过提权启动 Core

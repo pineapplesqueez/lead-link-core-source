@@ -1,17 +1,18 @@
 {
-  "go": "go version go1.27.3 darwin/arm64",
-  "libxrayCommit": "7fe8528063e54343af8ba9a37431afc56000de21",
-  "xrayModule": "v1.260327.1-0.20261031132019-a4a3dff5b20c",
-  "isolationPatchSHA256": "faf3bb75e84e9599650f47ce78e867e84a2d4fd05c8593782f2854eb53a5ea64",
+  "go": "go version go1.27.4 darwin/arm64",
+  "libxrayCommit": "5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3",
+  "xrayModule": "v1.260327.1-0.20261109052709-676eaf66f8f0",
+  "isolationPatchSHA256": "03777a316b02454f8e43d47843cfd39d8618e56503df726726af403760a70d60",
   "upstreamFiles": {
     "transport/internet/dialer.go": "ed2825ff30a2bfdfacf8681cd1af81d96179103ccff0a0b0b42f4ea64db451d4",
     "core/xray.go": "66edf1a9ed6b9683b4f668612e6c6e876830cffb07521517f03a21e630f7ef15",
     "core/context.go": "00bb4bec6236e621f2c1557b6b0b12d75be75b22eae93677a514091bde49627a",
-    "app/proxyman/outbound/handler.go": "77d3085a461b30a6a4d25273ba1487c9715655e1a6cfeafe17d6df0605f2c453",
-    "proxy/freedom/freedom.go": "9bc955f366bedfceee7d5030d285c417768453b18f54f8286c68fea19a2b7857",
+    "app/proxyman/outbound/handler.go": "296ce5b4b9127846dc490155fc04859731e724ad80280c07f98841d1a247ef83",
+    "proxy/freedom/freedom.go": "c3b162c361d114612616fe0067ff47e63bf3b0f212ed66f1a2d1b02c608cc48a",
     "transport/internet/grpc/dial.go": "f429ec9bb1fa143bc9c42cbcd976a20ef17774e37403444d0232d621d5de439d",
     "transport/internet/splithttp/dialer.go": "ed4ec0d02b7f4bed517f1326c534186e7648af81fe0c974f601a1e933666d0cd",
-    "app/observatory/observer.go": "13695e0edc373d198afe7b423b83ae7f19b9cad666856be4d3cf647040a2f434"
+    "app/observatory/observer.go": "13695e0edc373d198afe7b423b83ae7f19b9cad666856be4d3cf647040a2f434",
+    "app/observatory/explainErrors.go": "dc6ce779d66a0f7b0e264c2729aabae3fe96f350fcf7fbc03ecf5a928d2f9e6d"
   },
   "adapterSHA256": "781f36bbd1af1efab150ed7df706be52e329faeed86f950d2167b1e2e231c380",
   "adapterSources": {
@@ -20,28 +21,28 @@
     "readiness.go": "bd8f655ea74ad4a9a51ebc716350ecde2027bb6f5f85b4eb8388e8f1ec281f14"
   },
   "moduleFiles": {
-    "go.mod": "82405b5e7932314d00a11210378b0054cddce917b5119da97337de7f92b93a1e",
-    "go.sum": "be2bf91f51bf0c6520511794a768adea74aa55bcd56e44a34d205743a26c7269"
+    "go.mod": "ef8ca6760004c2059b0acf103808e01c02767ca3894a3bb90655364d9a91dc68",
+    "go.sum": "58316bacf36b73b49d1c9e0a127f57e5e96340c444746956bb88b2df606d7e79"
   },
   "files": {
-    "Info.plist": "83fa622783908888a023fcab4b8b7192b390e30c44dbb6042ad90b71db0bc2bd",
-    "ios-arm64/ProbeCore.framework/ProbeCore": "538d501b830fd4d35fa4c40eae2c830954ac2651d7c160502ccdff4d958a2862",
+    "Info.plist": "a399439156c4683daa0194c5eb7ed2c8c2b8e70f46e38429315a527ba6b5fd1c",
+    "ios-arm64/ProbeCore.framework/ProbeCore": "102b940d59b6965c7f05a7aa6e0eb040851bf0444b7b7b06932368605a56c5b3",
     "ios-arm64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
     "ios-arm64/ProbeCore.framework/Headers/ProbeCore.h": "970d0333ed3bcfd3d18f08b189b30d5e7b135efa61d12e8526ec013749ce9ed0",
     "ios-arm64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
-    "ios-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "f1d521c011706a987a7fe748c477e9eb742c8b8cc5098d2da57e519e806facc9",
+    "ios-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "710e9e195c44ad4b2c96cc1093e5bd69be5f16dca176f4aa30160648cf17d927",
     "ios-arm64_x86_64-simulator/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
     "ios-arm64_x86_64-simulator/ProbeCore.framework/Headers/ProbeCore.h": "970d0333ed3bcfd3d18f08b189b30d5e7b135efa61d12e8526ec013749ce9ed0",
     "ios-arm64_x86_64-simulator/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
-    "macos-arm64_x86_64/ProbeCore.framework/ProbeCore": "d1719fd0e53d4cd6088aa90b7f7fe43c5cd0314f1898553db99b5d3ee85aa9dd",
+    "macos-arm64_x86_64/ProbeCore.framework/ProbeCore": "5bfeac5c80b5b223f3dcd1905d52bb37f7cac3c8eba2c5b452e095e7db9967dd",
     "macos-arm64_x86_64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
     "macos-arm64_x86_64/ProbeCore.framework/Headers/ProbeCore.h": "970d0333ed3bcfd3d18f08b189b30d5e7b135efa61d12e8526ec013749ce9ed0",
     "macos-arm64_x86_64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
-    "tvos-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "c8a84ee33edaa8094fe5784c3654cfd65bea243c30eb1cc2c526648628678e61",
+    "tvos-arm64_x86_64-simulator/ProbeCore.framework/ProbeCore": "f1b6dad2480ce57f4bb24d03508c596fff3d4547ae036efaa7466ab792fcef57",
     "tvos-arm64_x86_64-simulator/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
     "tvos-arm64_x86_64-simulator/ProbeCore.framework/Headers/ProbeCore.h": "970d0333ed3bcfd3d18f08b189b30d5e7b135efa61d12e8526ec013749ce9ed0",
     "tvos-arm64_x86_64-simulator/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721",
-    "tvos-arm64/ProbeCore.framework/ProbeCore": "0b0152dac2e6d561ac10e28c12aa7157866dd9058ed637bb2ddf1a66a4bfc6a7",
+    "tvos-arm64/ProbeCore.framework/ProbeCore": "18571a1e8f7e33a766f1b6de81845c18378f4656ed7a8804133ebd87b763a027",
     "tvos-arm64/ProbeCore.framework/Info.plist": "7360ea3441aa59553230e1464bdc59c2d83ee277dab02cc93ba520c13e9f7d33",
     "tvos-arm64/ProbeCore.framework/Headers/ProbeCore.h": "970d0333ed3bcfd3d18f08b189b30d5e7b135efa61d12e8526ec013749ce9ed0",
     "tvos-arm64/ProbeCore.framework/Modules/module.modulemap": "218ed4e7181a64e234d9daf0c639579282ce01be05bd72b42a5e46327e269721"

@@ -11,7 +11,7 @@
 
 Репозиторий содержит соответствующие исходники компонентов ядра, используемых в **Lead Link**. Его поддерживает **ADAPTA SIA**. В пакет входят оригинальное ядро VPN-туннеля и изменённое ядро для параллельной проверки задержки профилей.
 
-Опубликованные исходники соответствуют ядру **Lead Link 1.0.0 (8)**. Обновление документации не означает новую сборку приложения или переход на более свежее upstream-ядро.
+В этом снимке собраны исходники Xray-core и libXray v26.11.9 для VPN-расширения Lead Link и адаптера проверки задержки.
 
 > Это пакет исходников ядра, а не полное приложение Lead Link и не готовый к установке VPN-клиент. Интерфейс приложения, слой хранения и реализация передачи на TV в пакет не входят.
 
@@ -31,10 +31,11 @@
 
 | Компонент | Версия |
 | --- | --- |
-| Xray-core | **v26.10.31** · коммит [`a4a3dff5b20c`](https://github.com/XTLS/Xray-core/commit/a4a3dff5b20c) |
-| libXray | Коммит [`7fe8528063e54343af8ba9a37431afc56000de21`](https://github.com/XTLS/libXray/commit/7fe8528063e54343af8ba9a37431afc56000de21) |
-| Go | **1.27.3** |
-| Патч изоляции Xray | **8 изменённых файлов**, используется только в ProbeCore |
+| Xray-core | **v26.11.9** · коммит [`676eaf66f8f0`](https://github.com/XTLS/Xray-core/commit/676eaf66f8f0) |
+| libXray | **v26.11.9** · коммит [`5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3`](https://github.com/XTLS/libXray/commit/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3) |
+| Go | **1.27.4** |
+| GeoIP Lite / GeoSite | [Xray-rules-dat 20261127013728](https://github.com/XTLS/Xray-rules-dat/releases/tag/20261127013728) |
+| Патч изоляции Xray | **9 изменённых файлов**, используется только в ProbeCore |
 
 Точные данные находятся в [upstream.lock.json](upstream.lock.json), [modules.lock.txt](modules.lock.txt) и [go-toolchain.lock.json](go-toolchain.lock.json). Они фиксируют исходники и граф зависимостей; сборка не следует за upstream-веткой `main`.
 
@@ -104,7 +105,7 @@ cd "$build_dir"
 python3 scripts/bootstrap-go.py
 python3 scripts/fetch-core.py
 python3 scripts/verify-upstream.py
-python3 scripts/build-core.py --go .cache/toolchains/go-1.27.3/go/bin/go
+python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go
 python3 scripts/verify-core.py
 python3 scripts/build-probe-core.py --test --race
 python3 scripts/build-probe-core.py
@@ -121,7 +122,7 @@ python3 scripts/verify-core.py --probe
 
 ## Лицензии и авторство
 
-- **Xray-core:** [MPL-2.0](Xray-core-original/LICENSE). Восемь изменённых файлов Xray также распространяются под [MPL-2.0](Xray-core-probe/LICENSE), с сохранением существующих уведомлений.
+- **Xray-core:** [MPL-2.0](Xray-core-original/LICENSE). Девять изменённых файлов Xray также распространяются под [MPL-2.0](Xray-core-probe/LICENSE), с сохранением существующих уведомлений.
 - **libXray:** [MIT](libXray/LICENSE).
 - **Остальные компоненты:** см. [ThirdPartyNotices.txt](ThirdPartyNotices.txt), [licenses.lock.json](licenses.lock.json), [GeodataLicenses](GeodataLicenses/) и уведомления в отдельных файлах. Репозиторий не назначает одну общую лицензию всем компонентам.
 
@@ -131,6 +132,8 @@ python3 scripts/verify-core.py --probe
 
 | Снимок | Содержание |
 | --- | --- |
+| [core-26.11.9](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9) | Xray-core и libXray 26.11.9, Go 1.27.4 и соответствующий патч ProbeCore. |
+| [build-1.1.0-10](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-1.1.0-10) | Исходники для Lead Link iOS 1.1.0 (10). |
 | Обновление документации · 20 ноября 2026 | README на английском и русском, оформление репозитория и пояснение о разрешении для локального слушателя macOS. Код ядра не менялся. |
 | [source-audit-2026-11-17](https://github.com/pineapplesqueez/lead-link-core-source/releases/tag/source-audit-2026-11-17) | Дополнен состав исходников и уведомлений о вложенных зависимостях; возвращены файлы, скрытые upstream-правилами исключения. |
 | [build-0.1.0-4](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-0.1.0-4) | Исторический снимок исходников, сохранённый для прослеживаемости. |

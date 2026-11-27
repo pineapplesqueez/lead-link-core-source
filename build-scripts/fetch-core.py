@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Fetch only the audited upstream source archive; never execute its scripts."""
+import argparse
 import hashlib
 import io
 import json
@@ -22,14 +23,21 @@ def check_source(directory):
     for name, digest in LOCK['manifest_sha256'].items():
         verify((directory / name).read_bytes(), digest, name)
     mod = (directory / 'go.mod').read_text()
-    if f"go {LOCK['go']}" not in mod or LOCK['xray_core']['module_version'] not in mod:
-        raise SystemExit('Unexpected Go or Xray-core version')
+    if LOCK['xray_core']['module_version'] not in mod:
+        raise SystemExit('Unexpected Xray-core version')
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--update', action='store_true', help='Keep an old checkout as a backup when installing a new pin')
+    args = parser.parse_args()
     destination = ROOT / 'Vendor/libXray'
     if destination.exists():
-        raise SystemExit('Vendor/libXray already exists; refusing to overwrite local sources.')
+        if not args.update:
+            raise SystemExit('Vendor/libXray already exists; use --update to preserve it and install a different pin.')
+        if all((destination / name).is_file() and hashlib.sha256((destination / name).read_bytes()).hexdigest() == digest
+               for name, digest in LOCK['manifest_sha256'].items()):
+            return
     # Use the macOS system trust store via curl, independent of Python's CA setup.
     archive = subprocess.check_output([
         '/usr/bin/curl', '--fail', '--location', '--silent', '--show-error',
@@ -55,7 +63,18 @@ def main():
                 tar.extractall(stage)
         source = stage / ('libXray-' + LOCK['libxray']['commit'])
         check_source(source)
-        shutil.move(str(source), str(destination))
+        backup = None
+        if destination.exists():
+            backup = Path(tempfile.mkdtemp(prefix='libXray-previous-', dir=destination.parent)) / 'libXray'
+            destination.rename(backup)
+        try:
+            source.rename(destination)
+        except OSError:
+            if backup is not None:
+                backup.rename(destination)
+            raise
+        if backup is not None:
+            print('Previous checkout preserved at', backup)
     print(f'Verified upstream sources: {destination}')
     print('No Go toolchain installed and no core binary built.')
 

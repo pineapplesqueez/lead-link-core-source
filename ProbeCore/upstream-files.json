@@ -2,9 +2,10 @@
   "transport/internet/dialer.go": "ed2825ff30a2bfdfacf8681cd1af81d96179103ccff0a0b0b42f4ea64db451d4",
   "core/xray.go": "66edf1a9ed6b9683b4f668612e6c6e876830cffb07521517f03a21e630f7ef15",
   "core/context.go": "00bb4bec6236e621f2c1557b6b0b12d75be75b22eae93677a514091bde49627a",
-  "app/proxyman/outbound/handler.go": "77d3085a461b30a6a4d25273ba1487c9715655e1a6cfeafe17d6df0605f2c453",
-  "proxy/freedom/freedom.go": "9bc955f366bedfceee7d5030d285c417768453b18f54f8286c68fea19a2b7857",
+  "app/proxyman/outbound/handler.go": "296ce5b4b9127846dc490155fc04859731e724ad80280c07f98841d1a247ef83",
+  "proxy/freedom/freedom.go": "c3b162c361d114612616fe0067ff47e63bf3b0f212ed66f1a2d1b02c608cc48a",
   "transport/internet/grpc/dial.go": "f429ec9bb1fa143bc9c42cbcd976a20ef17774e37403444d0232d621d5de439d",
   "transport/internet/splithttp/dialer.go": "ed4ec0d02b7f4bed517f1326c534186e7648af81fe0c974f601a1e933666d0cd",
-  "app/observatory/observer.go": "13695e0edc373d198afe7b423b83ae7f19b9cad666856be4d3cf647040a2f434"
+  "app/observatory/observer.go": "13695e0edc373d198afe7b423b83ae7f19b9cad666856be4d3cf647040a2f434",
+  "app/observatory/explainErrors.go": "dc6ce779d66a0f7b0e264c2729aabae3fe96f350fcf7fbc03ecf5a928d2f9e6d"
 }

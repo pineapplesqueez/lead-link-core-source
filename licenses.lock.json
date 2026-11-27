@@ -1,7 +1,7 @@
 [
   {
     "module": "Go standard library and runtime",
-    "version": "1.27.3",
+    "version": "1.27.4",
     "notices": {
       "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
       "src/crypto/internal/boring/LICENSE": "56210f826b8f0fbac3160dfe55c97f4019eb6cdda3963b5a0eab8a8bdb62360e",
@@ -9,13 +9,6 @@
       "src/vendor/golang.org/x/net/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
       "src/vendor/golang.org/x/sys/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
       "src/vendor/golang.org/x/text/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
-    }
-  },
-  {
-    "module": "github.com/andybalholm/brotli",
-    "version": "v1.2.7",
-    "notices": {
-      "LICENSE": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94"
     }
   },
   {
@@ -48,7 +41,7 @@
   },
   {
     "module": "github.com/huin/goupnp",
-    "version": "v1.3.0",
+    "version": "v1.3.1",
     "notices": {
       "LICENSE": "440688406aeb546bad566031c8a01531a01a683166f7010380fcc0f68d830311"
     }
@@ -78,14 +71,14 @@
   },
   {
     "module": "github.com/klauspost/cpuid/v2",
-    "version": "v2.4.1",
+    "version": "v2.4.2",
     "notices": {
       "LICENSE": "5d966570d7a442d4e969892860a914e542c97f262c873baee8f0aa48e1f40212"
     }
   },
   {
     "module": "github.com/koron/go-ssdp",
-    "version": "v0.9.1",
+    "version": "v0.9.2",
     "notices": {
       "LICENSE": "19bf6375dd79e92e109f5f2603f824a14056d051a5f9ef77ea02c573668fd0d1"
     }
@@ -140,6 +133,13 @@
     }
   },
   {
+    "module": "github.com/molecule-man/go-brrr",
+    "version": "v1.3.1",
+    "notices": {
+      "LICENSE": "a12fbad03be79cbaf575982d5dfa5ba515d42ffa4c08a42da137fe938e28e851"
+    }
+  },
+  {
     "module": "github.com/pelletier/go-toml",
     "version": "v1.9.5",
     "notices": {
@@ -176,7 +176,7 @@
   },
   {
     "module": "github.com/pion/transport/v5",
-    "version": "v5.1.4",
+    "version": "v5.1.5",
     "notices": {
       "LICENSE": "6483daf6c8aa2c8192528e60be098aa82dd18f6d7b96dc8246f4f7c3333fbf3f"
     }
@@ -197,7 +197,7 @@
   },
   {
     "module": "github.com/refraction-networking/utls",
-    "version": "v1.8.3-0.20260301010127-aa6edf4b11af",
+    "version": "v1.8.3-0.20261108164504-a13c59ffe98b",
     "notices": {
       "LICENSE": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067",
       "dicttls/LICENSE": "ac089a3cb515b32ba1c8c2b401646527f55815a9022013693d515f2e2e4fb6ec"
@@ -226,7 +226,7 @@
   },
   {
     "module": "github.com/xtls/reality",
-    "version": "v0.0.0-20261014101318-83f621788ca8",
+    "version": "v0.0.0-20261108101329-4bb46b2afd8b",
     "notices": {
       "LICENSE": "7c1bcfe5b0a8009ffae73984bad8e3b5f6bc562f67d6d67bafb600a3b8c08c5e",
       "LICENSE-Go": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
@@ -234,7 +234,7 @@
   },
   {
     "module": "github.com/xtls/xray-core",
-    "version": "v1.260327.1-0.20261031132019-a4a3dff5b20c",
+    "version": "v1.260327.1-0.20261109052709-676eaf66f8f0",
     "notices": {
       "LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
       "transport/internet/masque/connectip/LICENSE": "8bcbabf56e2d09741d209292f583cc1d0fe3c894040a03b972a656da87beeddf"
@@ -263,14 +263,14 @@
   },
   {
     "module": "golang.org/x/crypto/x509roots/fallback",
-    "version": "v0.0.0-20261030153154-30a33513ff6d",
+    "version": "v0.0.0-20261105095718-a1058eb15227",
     "notices": {
       "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
     }
   },
   {
     "module": "golang.org/x/exp",
-    "version": "v0.0.0-20261014143641-f0251eb4aa3e",
+    "version": "v0.0.0-20261106192419-47ce03d25ef0",
     "notices": {
       "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
     }
@@ -312,7 +312,7 @@
   },
   {
     "module": "google.golang.org/genproto/googleapis/rpc",
-    "version": "v0.0.0-20261026165753-2ffab32bce7e",
+    "version": "v0.0.0-20261104224025-d1e00e9f33ab",
     "notices": {
       "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
     }
