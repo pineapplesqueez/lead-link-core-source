@@ -1,6 +1,6 @@
 Lead Link — third-party notices
 
-The VPN extension includes unmodified libXray and Xray-core. The app probe core includes a Lead Link isolation overlay; its modified files are distributed under MPL-2.0.
+The VPN extension includes libXray and Xray-core with two Observatory concurrency fixes. The app probe includes those fixes and an isolation overlay. Modified Xray-core files are distributed under MPL-2.0.
 Corresponding source of the core components (original and modified Xray-core, libXray, ProbeCore, exact versions and build scripts): https://github.com/pineapplesqueez/lead-link-core-source
 Xray-core source: https://github.com/XTLS/Xray-core/tree/676eaf66f8f0
 libXray source: https://github.com/XTLS/libXray/tree/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3

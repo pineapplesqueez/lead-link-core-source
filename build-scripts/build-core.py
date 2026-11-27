@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build untouched upstream cgo sources with a frozen dependency graph."""
+"""Build pinned libXray with the audited Observatory fix for the tunnel."""
 import argparse
 import hashlib
 import json
@@ -8,6 +8,8 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
+from tunnel_observatory import apply_observatory_patch
 
 ROOT = Path(__file__).resolve().parent.parent
 LOCK = json.loads((ROOT / 'Core/upstream.lock.json').read_text())
@@ -16,6 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--go', required=True, type=Path, help='Path to the pinned Go executable')
 parser.add_argument('--test-server', action='store_true', help='Also build the isolated Xray test server')
 parser.add_argument('--mac-only', action='store_true', help='Build native arm64 smoke-test archive only')
+parser.add_argument('--test-observatory', action='store_true', help='Run regression tests with the Go race detector')
 args = parser.parse_args()
 go = args.go.resolve()
 version = subprocess.check_output([go, 'version'], text=True)
@@ -49,27 +52,42 @@ class FrozenAppleBuilder(AppleGoBuilder):
     # Reuse upstream target definitions, compiler flags, C bridge and packaging.
     # Deliberately exclude its mutable go-get/tidy and optional geo downloads.
     def init_go_env(self):
-        check_manifests()
-        subprocess.run([go, 'mod', 'download'], cwd=SOURCE, check=True)
-        subprocess.run([go, 'mod', 'verify'], cwd=SOURCE, check=True)
-        check_manifests()
-        check_graph()
+        pass  # Already verified before enabling the tunnel workspace.
 
     def download_geo(self):
         pass  # E1 configurations do not use geoip/geosite assets.
 
 check_manifests()
+subprocess.run([go, 'mod', 'download'], cwd=SOURCE, check=True)
+subprocess.run([go, 'mod', 'verify'], cwd=SOURCE, check=True)
+graph = check_graph()
+build_root = ROOT / '.build'
+build_root.mkdir(exist_ok=True)
+workspace = tempfile.TemporaryDirectory(prefix='tunnel-core-', dir=build_root)
+work = Path(workspace.name)
+xray_name = 'github.com/xtls/xray-core'
+xray_version = LOCK['xray_core']['module_version']
+xray = work / 'Xray-core'
+shutil.copytree(Path(os.environ['GOMODCACHE']) / (xray_name + '@' + xray_version), xray,
+                copy_function=shutil.copyfile)
+apply_observatory_patch(xray, ROOT)
+subprocess.run([go, 'work', 'init', SOURCE], cwd=work, check=True)
+os.environ['GOWORK'] = str(work / 'go.work')
+subprocess.run([go, 'work', 'edit', f'-replace={xray_name}@{xray_version}=./Xray-core'], cwd=work, check=True)
+resolved = subprocess.check_output([go, 'list', '-m', 'all'], cwd=SOURCE, text=True)
+expected = graph.replace(f'{xray_name} {xray_version}\n', f'{xray_name} {xray_version} => ./Xray-core\n')
+if resolved != expected:
+    raise SystemExit('Unexpected tunnel dependency graph')
+if args.test_observatory:
+    shutil.copyfile(ROOT / 'Core/Tests/observatory_snapshot_test.go', xray / 'app/observatory/leadlink_test.go')
+    subprocess.run([go, 'test', '-race', '-count=3', xray_name + '/app/observatory'], cwd=SOURCE, check=True)
+    sys.exit(0)
 out = ROOT / 'Artifacts'
 out.mkdir(exist_ok=True)
 builder = FrozenAppleBuilder(str(SOURCE / 'build'))
 if args.mac_only:
     builder.before_build()
     builder.build_targets([t for t in builder.macos_targets if t.go_arch == 'arm64'])
-    destination = out / 'NativeSmoke'
-    destination.mkdir(exist_ok=True)
-    for name in ('libXray.a', 'libXray.h'):
-        shutil.copy2(Path(builder.framework_dir) / 'macosx-arm64' / name, destination / name)
-    shutil.copy2(SOURCE / 'build/template/module.modulemap', destination / 'module.modulemap')
 else:
     builder.build()
     check_manifests()
@@ -78,20 +96,26 @@ else:
         shutil.rmtree(destination)
     shutil.copytree(SOURCE / 'LibXray.xcframework', destination)
 check_manifests()
-graph = check_graph()
 (out / 'core-modules.txt').write_text(graph)
+native = out / 'NativeSmoke'
+native.mkdir(exist_ok=True)
+for name in ('libXray.a', 'libXray.h'):
+    shutil.copy2(Path(builder.framework_dir) / 'macosx-arm64' / name, native / name)
+shutil.copy2(SOURCE / 'build/template/module.modulemap', native / 'module.modulemap')
 provenance = {
     'go': version.strip(), 'libxray_commit': LOCK['libxray']['commit'],
     'xcode': subprocess.check_output(['xcodebuild', '-version'], text=True).strip(),
     'modules_sha256': hashlib.sha256(graph.encode()).hexdigest(),
-    'local_core_patches': [], 'geo_assets': [],
-    'files': {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in sorted(destination.rglob('*')) if p.is_file()},
+    'local_core_patches': LOCK['local_patches'], 'geo_assets': [],
 }
-(out / (destination.name + '.provenance.json')).write_text(json.dumps(provenance, indent=2) + '\n')
-print(f'Built and recorded: {destination}', flush=True)
+for artifact in ([native] if args.mac_only else [native, destination]):
+    provenance['files'] = {str(p.relative_to(artifact)): hashlib.sha256(p.read_bytes()).hexdigest()
+                           for p in sorted(artifact.rglob('*')) if p.is_file()}
+    (out / (artifact.name + '.provenance.json')).write_text(json.dumps(provenance, indent=2) + '\n')
+    print(f'Built and recorded: {artifact}', flush=True)
 
 if args.test_server:
+    os.environ['GOWORK'] = 'off'  # Independent control server uses official Xray.
     server = out / 'TestServer/xray'
     server.parent.mkdir(exist_ok=True)
     subprocess.run([go, 'build', '-mod=readonly', '-trimpath', '-o', str(server), 'github.com/xtls/xray-core/main'], cwd=SOURCE, check=True)

@@ -58,7 +58,7 @@ def collect(root, go):
                 elif package.get('Standard') and package.get('Dir'):
                     add('Go standard library and runtime', lock['go'], goroot, package['Dir'])
 
-    sections = [f'Lead Link — third-party notices\n\nThe VPN extension includes unmodified libXray and Xray-core. The app probe core includes a Lead Link isolation overlay; its modified files are distributed under MPL-2.0.\nCorresponding source of the core components (original and modified Xray-core, libXray, ProbeCore, exact versions and build scripts): https://github.com/pineapplesqueez/lead-link-core-source\nXray-core source: https://github.com/XTLS/Xray-core/tree/{lock["xray_core"]["commit_prefix"]}\nlibXray source: https://github.com/XTLS/libXray/tree/{lock["libxray"]["commit"]}\n']
+    sections = [f'Lead Link — third-party notices\n\nThe VPN extension includes libXray and Xray-core with two Observatory concurrency fixes. The app probe includes those fixes and an isolation overlay. Modified Xray-core files are distributed under MPL-2.0.\nCorresponding source of the core components (original and modified Xray-core, libXray, ProbeCore, exact versions and build scripts): https://github.com/pineapplesqueez/lead-link-core-source\nXray-core source: https://github.com/XTLS/Xray-core/tree/{lock["xray_core"]["commit_prefix"]}\nlibXray source: https://github.com/XTLS/libXray/tree/{lock["libxray"]["commit"]}\n']
     manifest = []
     for name, module in sorted(modules.items()):
         notices = {}

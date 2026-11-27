@@ -9,7 +9,7 @@
 
 ---
 
-This repository provides the corresponding source for the core components used in **Lead Link**, maintained by **ADAPTA SIA**. It includes the original tunnel core and the modified core used for concurrent profile latency checks.
+This repository provides the corresponding source for the core components used in **Lead Link**, maintained by **ADAPTA SIA**. It includes the Xray sources used by the VPN tunnel and by concurrent profile latency checks.
 
 This snapshot contains the Xray-core and libXray v26.11.9 sources used to build the Lead Link tunnel and latency adapter.
 
@@ -19,7 +19,8 @@ This snapshot contains the Xray-core and libXray v26.11.9 sources used to build 
 
 | Path | What it contains |
 | --- | --- |
-| [Xray-core-original](Xray-core-original/) | Unmodified Xray-core used by the VPN extension. |
+| [Xray-core-original](Xray-core-original/) | Pinned upstream reference. |
+| [Xray-core-tunnel](Xray-core-tunnel/) | Tunnel source with the two Observatory fixes applied. |
 | [libXray](libXray/) | The upstream native bridge and Invoke API. |
 | [Xray-core-probe](Xray-core-probe/) | Xray-core with the Lead Link isolation changes already applied. |
 | [ProbeCore](ProbeCore/) | The app's Go probe adapter, tests, patch, and upstream file hashes. |
@@ -35,13 +36,13 @@ This snapshot contains the Xray-core and libXray v26.11.9 sources used to build 
 | libXray | **v26.11.9** · commit [`5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3`](https://github.com/XTLS/libXray/commit/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3) |
 | Go | **1.27.4** |
 | GeoIP Lite / GeoSite | [Xray-rules-dat 20261127013728](https://github.com/XTLS/Xray-rules-dat/releases/tag/20261127013728) |
-| Xray isolation overlay | **9 modified files**, used by ProbeCore only |
+| Xray isolation overlay | 9 files in ProbeCore, including the 2 Observatory files shared with the tunnel |
 
 The authoritative records are [upstream.lock.json](upstream.lock.json), [modules.lock.txt](modules.lock.txt), and [go-toolchain.lock.json](go-toolchain.lock.json). They pin the sources and dependency graph rather than following upstream `main`.
 
 ## Tunnel and latency checks
 
-**VPN extension → original LibXray / Xray-core.** The tunnel uses the unmodified upstream core.
+The VPN extension uses upstream libXray. In Xray-core, Observatory synchronizes status snapshots and error reports shared between goroutines.
 
 **Application → ProbeCore / isolated Xray-core.** Latency checks run separate full profile instances with their own loopback SOCKS listener, DNS, routing, and observers. The overlay isolates instance state and cleanup; it does not replace routing rules or balancer strategies. A profile's direct route can therefore produce a direct-route measurement.
 
@@ -92,6 +93,7 @@ From the root of this repository:
 build_dir="$(mktemp -d "${TMPDIR:-/tmp}/lead-link-core-build.XXXXXX")"
 mkdir -p "$build_dir/Core" "$build_dir/scripts"
 cp -R ProbeCore "$build_dir/Core/ProbeCore"
+cp -R Tests "$build_dir/Core/Tests"
 cp -R GeodataLicenses "$build_dir/Core/GeodataLicenses"
 cp upstream.lock.json modules.lock.txt licenses.lock.json \
   go-toolchain.lock.json geodata.lock.json "$build_dir/Core/"
@@ -105,6 +107,7 @@ Fetch and verify the pinned toolchain and the complete official libXray archive,
 python3 scripts/bootstrap-go.py
 python3 scripts/fetch-core.py
 python3 scripts/verify-upstream.py
+python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go --test-observatory
 python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go
 python3 scripts/verify-core.py
 python3 scripts/build-probe-core.py --test --race
@@ -132,6 +135,7 @@ The modified Xray source is published here directly, alongside its patch and ori
 
 | Snapshot | Scope |
 | --- | --- |
+| [core-26.11.9-observatory.1](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9-observatory.1) | Corresponding source for build 14 on iOS, macOS and tvOS, including the Observatory fixes in PacketTunnel. |
 | [core-26.11.9](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9) | Xray-core and libXray 26.11.9, Go 1.27.4 and the matching ProbeCore overlay. |
 | [build-1.1.0-10](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-1.1.0-10) | Corresponding sources for Lead Link iOS 1.1.0 (10). |
 | Documentation update · 20 November 2026 | English and Russian README pages, repository presentation, and the macOS loopback entitlement explanation. Core code unchanged. |

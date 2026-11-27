@@ -3,24 +3,27 @@
   "libxray_commit": "5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3",
   "xcode": "Xcode 27.2\nBuild version 27B52",
   "modules_sha256": "d3a61db415a2a30afa21c36b9303f9b38760e0cae6cc072f7514855c1d16c332",
-  "local_core_patches": [],
+  "local_core_patches": {
+    "app/observatory/observer.go": "2e1af7c4353d47271a350ae0b1ae05a3c44ea69eed12c410c493365590c75629",
+    "app/observatory/explainErrors.go": "c4b850b9e7dffbecf0a0b61b5678952fa8225737db421dadf8db6e1512310c09"
+  },
   "geo_assets": [],
   "files": {
-    "Info.plist": "810fb46ac3a7b63e11ce01c97b7b7e91ac39cd7fa46e64db5b075c9e3c41d8e6",
+    "Info.plist": "005d6c68dafe4d97852f81cde3f572ac2a6210c0e3f870223c7d188717f91bbe",
     "ios-arm64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
     "ios-arm64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
-    "ios-arm64/libXray.a": "2596ec5bb5435e4607319cb51e439b304a81f8784fc832742ff225cc503db289",
+    "ios-arm64/libXray.a": "24deb3504855d6475e72112fbc5c0ff828e7a5209a4fed8ea782624414f62dfb",
     "ios-arm64_x86_64-simulator/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
     "ios-arm64_x86_64-simulator/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
-    "ios-arm64_x86_64-simulator/libXray.a": "fddc66068efb09f0794e8c2663dd13f06683ebd8d915bd1d46982447eebca518",
+    "ios-arm64_x86_64-simulator/libXray.a": "5009c6f0498f607c01569ad1bdcb6f21d7c0dd417208b53cdcb2676dd88f6fdb",
     "macos-arm64_x86_64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
     "macos-arm64_x86_64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
-    "macos-arm64_x86_64/libXray.a": "227ae6969a0061aba5b9a1c8997dcbc0129ae64c612da8407f7012a243be60d8",
+    "macos-arm64_x86_64/libXray.a": "246f23ae0bc20ff32522d3c4710a5eae017f36d9f6bd60c249192ce7e2050d21",
     "tvos-arm64/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
     "tvos-arm64/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
-    "tvos-arm64/libXray.a": "a86dbeef0d03bd5a5c0fe6fa8c71721c64038d9cc251712ea8b4f08a9c059113",
+    "tvos-arm64/libXray.a": "1204f4bc71c945c39266fa91cd58ae8ae22a5b2371c3c93c695840486effd881",
     "tvos-arm64_x86_64-simulator/Headers/libXray.h": "9d1374d9570ab21bc658efe638dc39eab9e424660d28669e009b8b87821db27c",
     "tvos-arm64_x86_64-simulator/Headers/module.modulemap": "2352d2fa3aa2107d06f3e52e6566df9e5bb09d7fd4363cfdc24c5ef3768e7d46",
-    "tvos-arm64_x86_64-simulator/libXray.a": "4ec5d7ce37acb14bd64622a4b23c34d92f13c55a8c246e1d4758ebee7fd527ab"
+    "tvos-arm64_x86_64-simulator/libXray.a": "8f5ab259049b1a8ada4b5b9f9614914be2ceb69f5f534208e008d2f7f72efdb1"
   }
 }

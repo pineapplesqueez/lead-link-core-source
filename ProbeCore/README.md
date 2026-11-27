@@ -1,6 +1,6 @@
 # App-only parallel profile core
 
-Lead Link runs at most eight complete Xray profiles concurrently (`maximumProbes`, equal to `ProfileLatencyProbe.concurrency`) for HTTPS latency checks. Each has its own `core.Instance`, authenticated loopback SOCKS inbound, DNS client, outbound manager, routing and observers. The application links **ProbeCore**; PacketTunnel targets continue to link the original **LibXray**. Each process embeds exactly one Go runtime.
+Lead Link runs at most eight complete Xray profiles concurrently (`maximumProbes`, equal to `ProfileLatencyProbe.concurrency`) for HTTPS latency checks. Each has its own `core.Instance`, authenticated loopback SOCKS inbound, DNS client, outbound manager, routing and observers. The application links **ProbeCore**; PacketTunnel targets link **LibXray** with the same two Observatory fixes. Each process embeds exactly one Go runtime.
 
 `main.go` adds four internal Invoke v3 methods: `leadlink.startProbe` returns an opaque ownership token, `leadlink.stopProbe` closes only that token, `leadlink.probeState` reports active/peak instance counts, and `leadlink.probeObservation` returns readiness/revision/budget for that token. Observation responses contain no tags, URLs, keys or native errors. Existing methods delegate to pinned libXray. Managed start/test/ping operations are rejected while probes exist; probe start rejects an existing managed runtime. Lifecycle mutations are serialized, while the requests and observers run concurrently. The limit is enforced in the model, Swift worker pool and Go adapter.
 

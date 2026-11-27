@@ -1,6 +1,6 @@
 # Интеграция upstream-ядра — E1
 
-Закреплённая пара: libXray `5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3` и Xray-core `26.11.9`, соответствующий его go.mod. Go `1.27.4`. VPN-расширения используют неизменённый upstream. Приложение использует отдельный ProbeCore с адаптером и новым overlay для проверки до восьми полных профилей одновременно; [исходники, границы и сборка](ProbeCore/README.md). В каждом процессе ровно одна копия Go runtime. Системный VPN и проверки работают в разных процессах. Уже работающий managed core в процессе приложения не останавливается ради пробы.
+Закреплённая пара: libXray `5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3` и Xray-core `26.11.9`, соответствующий его go.mod. Go `1.27.4`. В Xray-core для VPN-расширений исправлена синхронизация статусов и отчётов об ошибках Observatory. Хеши двух изменённых файлов закреплены в `upstream.lock.json`. Приложение использует отдельный ProbeCore с адаптером и новым overlay для проверки до восьми полных профилей одновременно; [исходники, границы и сборка](ProbeCore/README.md). В каждом процессе ровно одна копия Go runtime. Системный VPN и проверки работают в разных процессах. Уже работающий managed core в процессе приложения не останавливается ради пробы.
 
 ## Воспроизводимая сборка
 
@@ -19,7 +19,7 @@ python3 scripts/collect-core-licenses.py --go .cache/toolchains/go-1.27.4/go/bin
 ./scripts/verify.sh
 ```
 
-`bootstrap-go.py` скачивает официальный архив по HTTPS, сверяет SHA-256 из `go-toolchain.lock.json` и устанавливает Go в `.cache/toolchains/go-1.27.4`. Повторный запуск сверяет receipt, хеш исполняемого файла и версию. Кэш находится в проекте и не зависит от очистки `/private/tmp` после обновления ОС. `fetch-core.py` проверяет SHA-256 архива, go.mod и go.sum. `verify-upstream.py` сравнивает все 86 файлов с официальным архивом, отказывается от изменённого исходного кода. `build-core.py` выполняет эту проверку до импорта Python-модулей upstream, проверяет версию Go, использует `GOTOOLCHAIN=local`, `GOWORK=off`, `go mod download/verify` и точное совпадение графа с `modules.lock.txt` перед компиляцией и после неё. Кэши по умолчанию находятся в `.cache/core`; их можно переопределить через `GOMODCACHE`/`GOCACHE`.
+`bootstrap-go.py` скачивает официальный архив по HTTPS, сверяет SHA-256 из `go-toolchain.lock.json` и устанавливает Go в `.cache/toolchains/go-1.27.4`. Повторный запуск сверяет receipt, хеш исполняемого файла и версию. Кэш находится в проекте и не зависит от очистки `/private/tmp` после обновления ОС. `fetch-core.py` проверяет SHA-256 архива, go.mod и go.sum. `verify-upstream.py` сравнивает все 86 файлов с официальным архивом, отказывается от изменённого исходного кода. `build-core.py` выполняет эту проверку до импорта Python-модулей upstream, проверяет версию Go, сверяет модули с `modules.lock.txt` и запускает `go mod verify` на закреплённом Go. Затем во временном Go workspace подключает копию Xray с двумя исправлениями Observatory и проверяет, что это единственная замена в графе. Кэши по умолчанию находятся в `.cache/core`; их можно переопределить через `GOMODCACHE`/`GOCACHE`.
 
 Повторно используются официальные target definitions, compiler flags, C bridge и упаковка AppleGoBuilder. Локальная оболочка заменяет изменяющие зависимости `go get`/`go mod tidy` на проверку закреплённого графа и отключает загрузку geo-данных: E1 их не использует. В E5 геобазы добавляются отдельно через `scripts/prepare-geodata.py`: версия архива и SHA-256 зафиксированы в `Core/geodata.lock.json`, данные включаются в bundle расширения, а с E5.1 также приложения для проверки профилей; подписка не управляет их загрузкой. Это изменение процесса сборки, а не патч ядра. Обновление зависимостей требует нового аудита и device regression.
 
@@ -38,6 +38,7 @@ python3 scripts/collect-core-licenses.py --go .cache/toolchains/go-1.27.4/go/bin
 ## Повторение тестов
 
 ```sh
+python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go --test-observatory
 python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go --mac-only --test-server
 python3 scripts/build-probe-core.py --mac-only
 python3 scripts/build-probe-core.py --test --race
@@ -67,4 +68,4 @@ Native-проверки выполняются на Apple Silicon Mac. Тест�
 - GeoIP Lite и GeoSite берутся из стабильного релиза Xray-rules-dat, указанного в `Core/geodata.lock.json`. Команда `python3 scripts/prepare-geodata.py --download` проверяет оба файла.
 - `python3 scripts/publish-core.py` — после пересборки любого ядра выложить новый релиз и обновить lock; затем закоммитить `Core/prebuilt.lock.json`.
 
-LibXray — неизменённый upstream; ProbeCore содержит app-only overlay (см. `Core/ProbeCore/README.md`), его соответствующие исходники распространяются пакетом `scripts/package-open-source.py`.
+Исходники libXray совпадают с upstream. В зависимости Xray-core для туннеля исправлены два файла Observatory. ProbeCore содержит app-only overlay (см. `Core/ProbeCore/README.md`), его соответствующие исходники распространяются пакетом `scripts/package-open-source.py`.

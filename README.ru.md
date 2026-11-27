@@ -9,7 +9,7 @@
 
 ---
 
-Репозиторий содержит соответствующие исходники компонентов ядра, используемых в **Lead Link**. Его поддерживает **ADAPTA SIA**. В пакет входят оригинальное ядро VPN-туннеля и изменённое ядро для параллельной проверки задержки профилей.
+Репозиторий содержит соответствующие исходники компонентов ядра, используемых в **Lead Link**. Его поддерживает **ADAPTA SIA**. В пакет входят исходники ядра VPN-туннеля и изменённое ядро для параллельной проверки задержки профилей.
 
 В этом снимке собраны исходники Xray-core и libXray v26.11.9 для VPN-расширения Lead Link и адаптера проверки задержки.
 
@@ -19,7 +19,8 @@
 
 | Путь | Содержимое |
 | --- | --- |
-| [Xray-core-original](Xray-core-original/) | Неизменённый Xray-core, используемый VPN-расширением. |
+| [Xray-core-original](Xray-core-original/) | Исходный релиз Xray-core. |
+| [Xray-core-tunnel](Xray-core-tunnel/) | Исходники туннеля с исправлениями двух файлов Observatory. |
 | [libXray](libXray/) | Нативный мост upstream и Invoke API. |
 | [Xray-core-probe](Xray-core-probe/) | Xray-core с уже применёнными изменениями для изоляции проверок Lead Link. |
 | [ProbeCore](ProbeCore/) | Go-адаптер проверок приложения, тесты, патч и хеши исходных upstream-файлов. |
@@ -35,13 +36,13 @@
 | libXray | **v26.11.9** · коммит [`5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3`](https://github.com/XTLS/libXray/commit/5a0f7d8d1c28b34afb5727b04b26a10f6dbac7e3) |
 | Go | **1.27.4** |
 | GeoIP Lite / GeoSite | [Xray-rules-dat 20261127013728](https://github.com/XTLS/Xray-rules-dat/releases/tag/20261127013728) |
-| Патч изоляции Xray | **9 изменённых файлов**, используется только в ProbeCore |
+| Патч Xray | В ProbeCore изменены 9 файлов. Два исправления Observatory также входят в туннель. |
 
 Точные данные находятся в [upstream.lock.json](upstream.lock.json), [modules.lock.txt](modules.lock.txt) и [go-toolchain.lock.json](go-toolchain.lock.json). Они фиксируют исходники и граф зависимостей; сборка не следует за upstream-веткой `main`.
 
 ## Туннель и проверка задержки
 
-**VPN-расширение → оригинальные LibXray / Xray-core.** Туннель использует неизменённое upstream-ядро.
+VPN-расширение использует upstream libXray. В Xray-core исправлена синхронизация снимков статусов и отчётов об ошибках Observatory.
 
 **Приложение → ProbeCore / изолированный Xray-core.** Для проверки задержки запускаются отдельные полные профили: у каждого собственный локальный SOCKS-слушатель, DNS, маршрутизация и наблюдатели. Патч изолирует состояние и завершение экземпляров; правила маршрутизации и стратегии балансировщиков не подменяются. Поэтому прямой маршрут в профиле может дать результат проверки через прямое соединение.
 
@@ -92,6 +93,7 @@ PY
 build_dir="$(mktemp -d "${TMPDIR:-/tmp}/lead-link-core-build.XXXXXX")"
 mkdir -p "$build_dir/Core" "$build_dir/scripts"
 cp -R ProbeCore "$build_dir/Core/ProbeCore"
+cp -R Tests "$build_dir/Core/Tests"
 cp -R GeodataLicenses "$build_dir/Core/GeodataLicenses"
 cp upstream.lock.json modules.lock.txt licenses.lock.json \
   go-toolchain.lock.json geodata.lock.json "$build_dir/Core/"
@@ -105,6 +107,7 @@ cd "$build_dir"
 python3 scripts/bootstrap-go.py
 python3 scripts/fetch-core.py
 python3 scripts/verify-upstream.py
+python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go --test-observatory
 python3 scripts/build-core.py --go .cache/toolchains/go-1.27.4/go/bin/go
 python3 scripts/verify-core.py
 python3 scripts/build-probe-core.py --test --race
@@ -132,6 +135,7 @@ python3 scripts/verify-core.py --probe
 
 | Снимок | Содержание |
 | --- | --- |
+| [core-26.11.9-observatory.1](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9-observatory.1) | Исходники сборки 14 для iOS, macOS и tvOS с исправлениями Observatory в PacketTunnel. |
 | [core-26.11.9](https://github.com/pineapplesqueez/lead-link-core-source/tree/core-26.11.9) | Xray-core и libXray 26.11.9, Go 1.27.4 и соответствующий патч ProbeCore. |
 | [build-1.1.0-10](https://github.com/pineapplesqueez/lead-link-core-source/tree/build-1.1.0-10) | Исходники для Lead Link iOS 1.1.0 (10). |
 | Обновление документации · 20 ноября 2026 | README на английском и русском, оформление репозитория и пояснение о разрешении для локального слушателя macOS. Код ядра не менялся. |

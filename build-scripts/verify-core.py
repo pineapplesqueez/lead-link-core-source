@@ -43,6 +43,7 @@ provenance = json.loads((root / 'Artifacts' / (name + '.provenance.json')).read_
 lock = json.loads((root / 'Core/upstream.lock.json').read_text())
 assert provenance['go'].split()[2] == 'go' + lock['go'], 'Framework toolchain differs from the pinned Go version'
 if not args.probe:
+    assert provenance['local_core_patches'] == lock['local_patches'], 'Tunnel Observatory patch mismatch'
     assert provenance['libxray_commit'] == lock['libxray']['commit'], 'Tunnel framework differs from pinned libXray'
     assert provenance['modules_sha256'] == hashlib.sha256((root / 'Core/modules.lock.txt').read_bytes()).hexdigest()
 for name, digest in provenance['files'].items():

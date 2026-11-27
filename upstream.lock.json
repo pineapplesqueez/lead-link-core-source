@@ -22,5 +22,8 @@
     "go.mod": "6cae0b0bb7f8fb6718b7e357ce28103161949c803901f7233bd9a8a862f56b02",
     "go.sum": "58316bacf36b73b49d1c9e0a127f57e5e96340c444746956bb88b2df606d7e79"
   },
-  "local_patches": []
+  "local_patches": {
+    "app/observatory/observer.go": "2e1af7c4353d47271a350ae0b1ae05a3c44ea69eed12c410c493365590c75629",
+    "app/observatory/explainErrors.go": "c4b850b9e7dffbecf0a0b61b5678952fa8225737db421dadf8db6e1512310c09"
+  }
 }
